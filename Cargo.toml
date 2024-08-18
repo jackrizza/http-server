@@ -12,4 +12,6 @@ clap = { version = "4.5.16", features = ["derive"] }
 env_logger = "0.11.5"
 future-utils = "0.12.1"
 futures = "0.3.30"
+futures-util = "0.3.30"
 serde = { version = "1.0.208", features = ["derive"] }
+tokio = { version = "1.39.3", features = ["full"] }

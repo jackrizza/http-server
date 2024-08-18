@@ -9,11 +9,12 @@
         <link rel="stylesheet" href="/css/skeleton.css" />
     </head>
     <body class="container">
-        <h2>Upload</h2>
-        <form action="/upload_file" method="post" enctype="multipart/form-data">
-            <input type="file" name="payload" required />
+        <h2>Login</h2>
+        <form action="/login" method="post" enctype="multipart/form-data">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required />
             <br />
-            <button type="submit" name="submit">Upload</button>
+            <button type="submit" name="submit">Log In</button>
         </form>
     </body>
 </html>

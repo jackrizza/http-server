@@ -1,7 +1,7 @@
 use actix_multipart::Multipart;
 use actix_web::web::Redirect;
-use actix_web::{get, post, web, Error, HttpResponse, Responder};
-use futures::{StreamExt, TryStreamExt};
+use actix_web::{get, post, web, HttpResponse, Responder};
+use futures::StreamExt;
 use std::io::Write;
 
 #[get("/upload_file")]

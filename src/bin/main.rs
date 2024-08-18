@@ -1,39 +1,45 @@
 extern crate httpserver;
+use clap::Parser;
+use httpserver::datastore::{DataStore, Op};
+use httpserver::router;
 
-use actix_files as fs;
-use actix_session::{storage::CookieSessionStore, SessionMiddleware};
-use actix_web::cookie::Key;
-use actix_web::middleware::Logger;
-use actix_web::{App, HttpServer};
+/// Simple HTTP server
+/// refer to https://github.com/jackrizza/http-server
+/// for more information
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// change the port number. Default is 8888
+    #[arg(long, default_value_t = 8888)]
+    port: u16,
 
-use httpserver::routes::landing::landing;
-use httpserver::routes::upload::{get_upload_file, post_upload_file};
-use httpserver::routes::{normalize_css, skeleton_css};
+    /// Authenticate the user
+    #[arg(short, long, default_value_t = false)]
+    authenticate: bool,
 
-fn secrect_key() -> Key {
-    Key::generate()
+    /// set password for authentication (required for authenticate flag)
+    #[arg(short, long, default_value_t = String::from(""))]
+    password: String,
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // configuration file or environment variables.
+    let args = Args::parse();
 
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-    HttpServer::new(|| {
-        App::new()
-            .wrap(SessionMiddleware::new(
-                CookieSessionStore::default(),
-                secrect_key().clone(),
-            ))
-            .wrap(Logger::default())
-            .service(fs::Files::new("/static", ".").show_files_listing())
-            .service(normalize_css)
-            .service(skeleton_css)
-            .service(get_upload_file)
-            .service(post_upload_file)
-            .service(landing)
-    })
-    .bind(("127.0.0.1", 8888))?
-    .run()
-    .await
+    let mut datastore = DataStore::new();
+    datastore.listen();
+
+    let is_password = || match args.password == "" {
+        true => panic!("Password is required"),
+        false => datastore.send(Op::Upsert("Password".into(), args.password)),
+    };
+    match args.authenticate {
+        true => {
+            datastore.send(Op::Upsert("Authenticate".into(), "true".into()));
+            is_password();
+        }
+        false => (),
+    }
+
+    router(args.port, &mut datastore).await
 }
