@@ -24,6 +24,6 @@ Options:
 ```
 
 ### future
-- [ x ] cli
+- [x] cli
 - [ ] better error handling
 - [ ] authentication
