@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Upload</title>
+        <link rel="stylesheet" href="/css/normalize.css" />
+        <link rel="stylesheet" href="/css/skeleton.css" />
+    </head>
+    <body class="container">
+        <h2>Upload</h2>
+        <form action="/upload_file" method="post" enctype="multipart/form-data">
+            <input type="file" name="payload" required />
+            <br />
+            <button type="submit" name="submit">Upload</button>
+        </form>
+    </body>
+</html>
+<script type="text/javascript">
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    window.onload = function () {
+        if (urlParams.get("toast").length > 0) {
+            alert(urlParams.get("toast"));
+        }
+    };
+</script>
