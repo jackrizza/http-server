@@ -1,4 +1,4 @@
-use crate::datastore::{DataStore, Op};
+use crate::datastore::DataStore;
 
 pub async fn is_auth_required(ds: &mut DataStore) -> bool {
     let store = ds.clone();

@@ -1,17 +1,16 @@
 use actix_multipart::Multipart;
 use actix_session::Session;
-use actix_web::web::Redirect;
+use actix_web::http::header::LOCATION;
 use actix_web::{get, post, web, HttpResponse, Responder};
 use futures::StreamExt;
 use std::io::Write;
-use actix_web::http::header::LOCATION;
 
 use crate::datastore::DataStore;
 
 use crate::auth_chain;
 
 #[get("/upload_file")]
-pub async fn get_upload_file(data : web::Data<DataStore>, session : Session) -> impl Responder {
+pub async fn get_upload_file(data: web::Data<DataStore>, session: Session) -> impl Responder {
     let mut ds = data.as_ref().clone();
     let key = match session.get::<String>("session") {
         Ok(Some(key)) => key,
@@ -20,8 +19,8 @@ pub async fn get_upload_file(data : web::Data<DataStore>, session : Session) -> 
     println!("key : {}", key);
     if !auth_chain(key, &mut ds).await {
         return HttpResponse::SeeOther()
-        .insert_header((LOCATION, "/login"))
-        .finish();
+            .insert_header((LOCATION, "/login"))
+            .finish();
     }
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
@@ -29,17 +28,21 @@ pub async fn get_upload_file(data : web::Data<DataStore>, session : Session) -> 
 }
 
 #[post("/upload_file")]
-pub async fn post_upload_file(mut payload: Multipart, data : web::Data<DataStore>, session : Session) -> impl Responder {
+pub async fn post_upload_file(
+    mut payload: Multipart,
+    data: web::Data<DataStore>,
+    session: Session,
+) -> impl Responder {
     let key = match session.get::<String>("session") {
         Ok(Some(key)) => key,
         _ => "".to_string(),
     };
-   
+
     let mut ds = data.as_ref().clone();
     if !auth_chain(key, &mut ds).await {
-        return  HttpResponse::SeeOther()
-        .insert_header((LOCATION, "/login"))
-        .finish();
+        return HttpResponse::SeeOther()
+            .insert_header((LOCATION, "/login"))
+            .finish();
     }
     while let Some(field) = payload.next().await {
         let (mut field, file_name) = match field {
@@ -49,9 +52,11 @@ pub async fn post_upload_file(mut payload: Multipart, data : web::Data<DataStore
                 let file_name = file_name.to_owned();
                 (f, file_name)
             }
-            Err(e) => return HttpResponse::SeeOther()
-            .insert_header((LOCATION, "/upload_file?toast=error"))
-            .finish(),
+            Err(_) => {
+                return HttpResponse::SeeOther()
+                    .insert_header((LOCATION, "/upload_file?toast=error"))
+                    .finish()
+            }
         };
 
         // File::create is blocking operation, use threadpool
@@ -60,23 +65,27 @@ pub async fn post_upload_file(mut payload: Multipart, data : web::Data<DataStore
             .unwrap()
         {
             Ok(f) => f,
-            Err(e) => return HttpResponse::SeeOther()
-            .insert_header((LOCATION, "/upload_file?toast=error"))
-            .finish(),
+            Err(_) => {
+                return HttpResponse::SeeOther()
+                    .insert_header((LOCATION, "/upload_file?toast=error"))
+                    .finish()
+            }
         };
 
         while let Some(chunk) = field.next().await {
             let chunk = match chunk {
                 Ok(chunk) => chunk,
-                Err(e) => return HttpResponse::SeeOther()
-                .insert_header((LOCATION, "/upload_file?toast=error"))
-                .finish(),
+                Err(_) => {
+                    return HttpResponse::SeeOther()
+                        .insert_header((LOCATION, "/upload_file?toast=error"))
+                        .finish()
+                }
             };
             let _ = f.write_all(&chunk);
         }
     }
 
     HttpResponse::SeeOther()
-            .insert_header((LOCATION, "/upload_file?toast=sucess"))
-            .finish()
+        .insert_header((LOCATION, "/upload_file?toast=sucess"))
+        .finish()
 }
