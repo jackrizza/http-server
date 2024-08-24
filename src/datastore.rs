@@ -25,7 +25,6 @@ impl AsRef<DataStore> for DataStore {
         self
     }
 }
-
 impl DataStore {
     pub fn new() -> Self {
         let (sender, receiver) = mpsc::channel();
