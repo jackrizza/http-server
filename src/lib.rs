@@ -49,7 +49,7 @@ pub async fn router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     HttpServer::new(move || {
         App::new()
-        .app_data(ds.clone())
+            .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
             .service(fs::Files::new("/static", ".").show_files_listing())
@@ -57,13 +57,12 @@ pub async fn router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .service(skeleton_css)
             .service(get_upload_file)
             // .route("/upload_file", web::get().to( || get_upload_file(&mut ds)))
-            
             .service(post_upload_file)
             .service(landing)
             .service(login)
             .service(post_login)
     })
-    .bind(("127.0.0.1", port))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }
