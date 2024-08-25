@@ -7,7 +7,7 @@ use std::io::Write;
 
 use crate::datastore::DataStore;
 
-use crate::auth_chain;
+use crate::auth::auth_chain;
 
 #[get("/upload_file")]
 pub async fn get_upload_file(data: web::Data<DataStore>, session: Session) -> impl Responder {

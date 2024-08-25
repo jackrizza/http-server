@@ -9,7 +9,8 @@ use datastore::DataStore;
 use actix_session::config::{BrowserSession, CookieContentSecurity};
 use actix_web;
 
-use routes::landing::{landing, login, post_login};
+use routes::landing::landing;
+use routes::login::{login, post_login};
 use routes::upload::{get_upload_file, post_upload_file};
 use routes::{normalize_css, skeleton_css};
 
@@ -30,17 +31,6 @@ fn session_middleware() -> SessionMiddleware<CookieSessionStore> {
         .build()
 }
 
-pub async fn auth_chain(key: String, ds: &mut DataStore) -> bool {
-    if auth::is_auth_required(ds).await {
-        if auth::allowed_session(key, ds).await {
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        return true;
-    }
-}
 
 pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
     let ds = web::Data::new(ds.clone());

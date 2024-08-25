@@ -14,17 +14,14 @@ struct Args {
     port: u16,
 
     /// Authenticate the user
+    /// openssl
+    /// needed for authentication (Cookies won't work without it)
     #[arg(short, long, default_value_t = false)]
     authenticate: bool,
 
     /// set password for authentication (required for authenticate flag)
     #[arg(short, long, default_value_t = String::from(""))]
     password: String,
-
-    /// openssl
-    /// needed for authentication (Cookies won't work without it)
-    #[arg(short, long, default_value_t = false)]
-    openssl: bool,
 
     #[arg(long, default_value_t = String::from("key.pem"))]
     pem_file: String,
@@ -36,7 +33,7 @@ struct Args {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let args = Args::parse();
-    println!("{:?}", args);
+
     let mut datastore = DataStore::new();
     datastore.listen();
 
@@ -44,16 +41,14 @@ async fn main() -> std::io::Result<()> {
         true => panic!("Password is required"),
         false => datastore.send(Op::Upsert("Password".into(), args.password)),
     };
+    
     match args.authenticate {
         true => {
             datastore.send(Op::Upsert("Authenticate".into(), "true".into()));
             is_password();
+            
+            https_router(&mut datastore, args.pem_file, args.cert_file).await
         }
-        false => (),
-    }
-    if args.openssl {
-        https_router(&mut datastore, args.pem_file, args.cert_file).await
-    } else {
-        http_router(args.port, &mut datastore).await
+        false => http_router(args.port, &mut datastore).await,
     }
 }

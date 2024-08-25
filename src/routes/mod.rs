@@ -1,5 +1,6 @@
 pub mod landing;
 pub mod upload;
+pub mod login;
 
 use actix_web::{get, HttpResponse, Responder};
 
