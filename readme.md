@@ -25,9 +25,8 @@ Usage: main [OPTIONS]
 
 Options:
       --port <PORT>            change the port number. Default is 8888 [default: 8888]
-  -a, --authenticate           Authenticate the user
+  -a, --authenticate           Authenticate the user openssl needed for authentication (Cookies won\'t work without it)
   -p, --password <PASSWORD>    set password for authentication (required for authenticate flag) [default: ]
-  -o, --openssl                openssl needed for authentication (Cookies won't work without it)
       --pem-file <PEM_FILE>    [default: key.pem]
       --cert-file <CERT_FILE>  [default: cert.pem]
   -h, --help                   Print help
