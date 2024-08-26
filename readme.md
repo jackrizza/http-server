@@ -21,7 +21,7 @@ openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 36
 
 Simple HTTP Server refer to https://github.com/jackrizza/http-server for more information
 
-Usage: main [OPTIONS]
+Usage: http-server [OPTIONS]
 
 Options:
       --port <PORT>            change the port number. Default is 8888 [default: 8888]
@@ -35,7 +35,11 @@ Options:
 
 ```
 
-### future
-- [x] cli
-- [ ] better error handling
-- [x] authentication
+### Running
+```bash
+./http-server
+
+# or
+
+./http-server -a -p password
+```
