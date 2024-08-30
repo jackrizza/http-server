@@ -6,7 +6,6 @@ use actix_web::{get, post, web, HttpResponse, Responder};
 use nanoid::nanoid;
 use serde::Deserialize;
 
-
 #[derive(Debug, Deserialize)]
 struct Login {
     password: String,
@@ -16,7 +15,7 @@ struct Login {
 pub async fn login() -> impl Responder {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(include_str!("../www/login.html"))
+        .body(include_str!("../www2/login.html"))
 }
 
 #[post("/login")]
@@ -33,7 +32,7 @@ pub async fn post_login(
         match session.insert("session", session_id) {
             Ok(_) => {
                 return HttpResponse::SeeOther()
-                    .insert_header((LOCATION, "/"))
+                    .insert_header((LOCATION, "/#/"))
                     .finish()
             }
             Err(_) => {

@@ -19,3 +19,5 @@ nanoid = "0.4.0"
 openssl = "0.10.66"
 serde = { version = "1.0.208", features = ["derive"] }
 tokio = { version = "1.39.3", features = ["full"] }
+walkdir = "2.5.0"
+chrono = "0.4.38"

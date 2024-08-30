@@ -2,13 +2,14 @@ use actix_files as fs;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::Logger;
-use actix_web::{web, App};
+use actix_web::{get, web, App, HttpResponse, Responder};
 use actix_web::{HttpServer, Result};
 use datastore::DataStore;
 
 use actix_session::config::{BrowserSession, CookieContentSecurity};
 use actix_web;
 
+use routes::files::{all, get_file};
 use routes::landing::landing;
 use routes::login::{login, post_login};
 use routes::upload::{get_upload_file, post_upload_file};
@@ -31,6 +32,16 @@ fn session_middleware() -> SessionMiddleware<CookieSessionStore> {
         .build()
 }
 
+#[get("/favicon.ico")]
+pub async fn favicon() -> impl Responder {
+    let image_content = match web::block(|| std::fs::read("src/www2/icons/favicon.ico")).await {
+        Ok(image) => image.unwrap(),
+        _ => Vec::new(),
+    };
+    HttpResponse::Ok()
+        .content_type("image/jpeg")
+        .body(image_content)
+}
 
 pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
     let ds = web::Data::new(ds.clone());
@@ -42,6 +53,7 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
+            .service(fs::Files::new("/api", "./src/www2").show_files_listing())
             .service(fs::Files::new("/static", ".").show_files_listing())
             .service(normalize_css)
             .service(skeleton_css)
@@ -51,6 +63,9 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .service(landing)
             .service(login)
             .service(post_login)
+            .service(favicon)
+            .service(all)
+            .service(get_file)
     })
     .bind(("0.0.0.0", port))?
     .run()
@@ -97,6 +112,7 @@ pub async fn https_router(
             .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
+            .service(fs::Files::new("/api", "./src/www2").show_files_listing())
             .service(fs::Files::new("/static", ".").show_files_listing())
             .service(normalize_css)
             .service(skeleton_css)
@@ -106,6 +122,9 @@ pub async fn https_router(
             .service(landing)
             .service(login)
             .service(post_login)
+            .service(favicon)
+            .service(all)
+            .service(get_file)
     })
     .bind_rustls_0_23(("0.0.0.0", 8443), tls_config)?
     .workers(2)

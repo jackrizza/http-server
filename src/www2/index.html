@@ -1,0 +1,88 @@
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Simple HTTP Server</title>
+        <link rel="stylesheet" href="/api/css/foundation.css" />
+        <link rel="stylesheet" href="/api/css/app.css" />
+    </head>
+    <body>
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <ul class="dropdown menu" data-dropdown-menu>
+                    <li class="menu-text"><h4>Simple HTTP Server</h4></li>
+                </ul>
+            </div>
+            <div class="top-bar-right">
+                <ul class="menu">
+                    <!-- <li><input type="search" placeholder="Search" /></li> -->
+                    <!-- <li>
+                        <button type="button" class="button">Search</button>
+                    </li> -->
+
+                    <li>
+                        <a href="" id="upload_file_modal_toggle_top_bar"
+                            >Upload File</a
+                        >
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="dashboard-table">
+                <colgroup>
+                    <col width="400" />
+                    <col width="200" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="#">Name<i class="fa fa-caret-down"></i></a>
+                        </th>
+                        <th>
+                            <a href="#">Date<i class="fa fa-caret-down"></i></a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="table_body"></tbody>
+            </table>
+        </div>
+
+        <div class="overlay hide" id="upload_overlay">
+            <div class="translucent-form-overlay">
+                <form
+                    action="/upload_file"
+                    method="post"
+                    enctype="multipart/form-data"
+                >
+                    <h4>Upload</h4>
+
+                    <div class="input-group">
+                        <input type="file" name="payload" required />
+                    </div>
+
+                    <div class="input-group">
+                        <input
+                            type="submit"
+                            class="button expanded"
+                            value="Upload File"
+                        />
+                    </div>
+
+                    <a href="" id="upload_file_modal_toggle_overlay"
+                        >Close Upload Overlay</a
+                    >
+                </form>
+            </div>
+        </div>
+
+        <script src="/api/js/vendor/jquery.js"></script>
+        <script src="/api/js/vendor/what-input.js"></script>
+        <script src="/api/js/vendor/foundation.js"></script>
+        <script src="/api/js/app.js"></script>
+        <script src="/api/js/table_builder.js"></script>
+    </body>
+</html>
