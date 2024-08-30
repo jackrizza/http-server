@@ -1,6 +1,6 @@
 function show_file(path) {
   /* File */
-  let frame = document.createElement("iframe");
+  let frame = document.createElement("embed");
   frame.classList = "file-frame";
   frame.src = "/get/file/" + path;
 
@@ -31,7 +31,9 @@ function show_file(path) {
   let div = document.createElement("div");
   div.classList = "overlay";
   div.onclick = function (e) {
-    e.target.remove();
+    if (e.target.classList.contains("overlay")) {
+      e.target.remove();
+    }
   };
 
   div.appendChild(topbar);

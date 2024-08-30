@@ -1,14 +1,16 @@
 function table_builder() {
   let table_body = document.getElementById("table_body");
   table_body.innerHTML = "";
-  table_body.appendChild(create_table_row("..", "folder", "", ".."));
+
+  let url = location.href.split(location.host)[1];
+  let current_path = url.split("#/");
+  current_path = current_path[current_path.length - 1];
+  if (current_path.length > 0 || current_path == ".") {
+    table_body.appendChild(create_table_row("..", "folder", "", ".."));
+  }
   fetch("/files")
     .then((data) => data.json())
     .then((data) => {
-      let url = location.href.split(location.host)[1];
-      let current_path = url.split("#/");
-      console.log(current_path);
-      current_path = current_path[current_path.length - 1];
       data.forEach((d) => {
         let file_name = d.File == undefined ? d.Folder.name : d.File.name;
         let file_type = d.File == undefined ? "folder" : "file";
@@ -33,6 +35,9 @@ function table_builder() {
 }
 
 function goto_folder(path) {
+  if (path == undefined) {
+    return;
+  }
   if (path == "..") {
     history.back();
   } else {
@@ -52,9 +57,11 @@ function create_table_row(file_name, file_type, file_date, file_path) {
   } else {
     icon_img.src = "/api/icons/folder.png";
   }
+  icon_img.dataset.goto = file_path;
 
   let icon_shrink = document.createElement("div");
   icon_shrink.classList = "flex-child-shrink";
+  icon_shrink.dataset.goto = file_path;
 
   let icon_container = document.createElement("div");
   icon_container.classList = "flex-container align-justify align-top";
@@ -70,6 +77,8 @@ function create_table_row(file_name, file_type, file_date, file_path) {
 
   let file_name_container = document.createElement("div");
   file_name_container.classList = "flex-child-grow";
+
+  file_name_container.dataset.goto = file_path;
   file_name_container.appendChild(file_name_h6);
 
   icon_container.appendChild(file_name_container);
@@ -80,6 +89,7 @@ function create_table_row(file_name, file_type, file_date, file_path) {
   let timestamp = document.createElement("span");
   timestamp.classList = "dashboard-table-timestamp";
   timestamp.innerText = file_date;
+  timestamp.dataset.goto = file_path;
 
   file_date_component.appendChild(timestamp);
 

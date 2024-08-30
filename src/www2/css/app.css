@@ -213,10 +213,11 @@ form .form-icons .fa {
 .file-frame {
     /* position: fixed; */
     height: 80%;
-    min-width: 60%;
+    min-width: 70%;
     width: auto;
     background: white;
-    border: 0;
+    border: 1px solid grey;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
 
 tr {

@@ -54,7 +54,7 @@ pub async fn post_upload_file(
             }
             Err(_) => {
                 return HttpResponse::SeeOther()
-                    .insert_header((LOCATION, "/upload_file?toast=error"))
+                    .insert_header((LOCATION, "/#/"))
                     .finish()
             }
         };
@@ -67,7 +67,7 @@ pub async fn post_upload_file(
             Ok(f) => f,
             Err(_) => {
                 return HttpResponse::SeeOther()
-                    .insert_header((LOCATION, "/upload_file?toast=error"))
+                    .insert_header((LOCATION, "/#/"))
                     .finish()
             }
         };
@@ -77,7 +77,7 @@ pub async fn post_upload_file(
                 Ok(chunk) => chunk,
                 Err(_) => {
                     return HttpResponse::SeeOther()
-                        .insert_header((LOCATION, "/upload_file?toast=error"))
+                        .insert_header((LOCATION, "/#/"))
                         .finish()
                 }
             };
@@ -86,6 +86,6 @@ pub async fn post_upload_file(
     }
 
     HttpResponse::SeeOther()
-        .insert_header((LOCATION, "/upload_file?toast=sucess"))
+        .insert_header((LOCATION, "/#/"))
         .finish()
 }
