@@ -7,9 +7,8 @@ function table_builder() {
     .then((data) => {
       let url = location.href.split(location.host)[1];
       let current_path = url.split("#/");
-      // console.log(current_path);
-      current_path = current_path[current_path.length - 1];
       console.log(current_path);
+      current_path = current_path[current_path.length - 1];
       data.forEach((d) => {
         let file_name = d.File == undefined ? d.Folder.name : d.File.name;
         let file_type = d.File == undefined ? "folder" : "file";
@@ -22,7 +21,7 @@ function table_builder() {
         if (
           new_file_path == current_path ||
           new_file_path == "." + current_path ||
-          new_file_path == "./" + current_path + "/"``
+          new_file_path == "./" + current_path + "/"
         ) {
           console.log(new_file_path, current_path);
           table_body.appendChild(
@@ -33,36 +32,10 @@ function table_builder() {
     });
 }
 
-function show_file(path) {
-  let frame = document.createElement("iframe");
-  frame.classList = "file-frame";
-  frame.src = "/get/file/" + path;
-
-  let div = document.createElement("div");
-  div.classList = "overlay";
-  div.onclick = function (e) {
-    e.target.remove();
-  };
-
-  div.appendChild(frame);
-
-  document.body.appendChild(div);
-}
-
 function goto_folder(path) {
   if (path == "..") {
-    let url = location.href.split(location.host)[1];
-    console.log(url);
-    let current_path = url.split("/");
-    current_path.pop();
-    console.log(current_path);
-    current_path = current_path.toString() + "/";
-    current_path = current_path.replace(/,/g, "/");
-    console.log("going up :", current_path);
-    window.location.href =
-      "/#/" + current_path == undefined ? "" : current_path;
+    history.back();
   } else {
-    console.log("going to :", path);
     window.location.href = "/#/" + path;
   }
 }

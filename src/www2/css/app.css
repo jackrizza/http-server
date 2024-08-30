@@ -22,12 +22,23 @@ body {
 }
 
 .login {
-    width: 40%;
     margin: 0 auto;
     padding: 5%;
     background: white;
     border-radius: 8px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+@media screen and (min-width: 720px) {
+    .login {
+        width: 40%;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    .login {
+        width: 100%;
+    }
 }
 
 form .form-icons {
@@ -200,8 +211,8 @@ form .form-icons .fa {
 }
 
 .file-frame {
-    position: fixed;
-    height: 95%;
+    /* position: fixed; */
+    height: 80%;
     min-width: 60%;
     width: auto;
     background: white;
@@ -210,4 +221,11 @@ form .form-icons .fa {
 
 tr {
     cursor: pointer;
+}
+
+.overlay-top-bar {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
 }
