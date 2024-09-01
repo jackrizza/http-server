@@ -1,8 +1,31 @@
 function show_file(path) {
+  if (path == undefined) {
+    return;
+  }
+
+  let ext = path.split(".");
+  ext = ext[ext.length - 1];
+
   /* File */
-  let frame = document.createElement("embed");
+  let frame = document.createElement("object");
   frame.classList = "file-frame";
-  frame.src = "/get/file/" + path;
+  frame.data = "/get/file/" + path;
+  frame.type = "text/plain";
+  if (ext == "pdf") {
+    frame.type = "application/pdf";
+  }
+  if (ext == "png") {
+    frame.type = "image/png";
+  }
+  if (ext == "jpg" || ext == "jpeg") {
+    frame.type = "image/jpeg";
+  }
+  if (ext == "csv") {
+    frame.type = "text/csv";
+  }
+  if (ext == "json") {
+    frame.type = "application/json";
+  }
 
   /* Top Bar */
   let topbar = document.createElement("div");

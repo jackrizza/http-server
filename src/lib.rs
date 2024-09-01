@@ -9,7 +9,7 @@ use datastore::DataStore;
 use actix_session::config::{BrowserSession, CookieContentSecurity};
 use actix_web;
 
-use routes::files::{all, get_file};
+use routes::files::{all, get_file, new_folder};
 use routes::landing::landing;
 use routes::login::{login, post_login};
 use routes::upload::{get_upload_file, post_upload_file};
@@ -53,7 +53,7 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
-            .service(fs::Files::new("/api", "./src/www2").show_files_listing())
+            .service(fs::Files::new("/cdn", "./src/www2").show_files_listing())
             .service(fs::Files::new("/static", ".").show_files_listing())
             .service(normalize_css)
             .service(skeleton_css)
@@ -66,6 +66,7 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .service(favicon)
             .service(all)
             .service(get_file)
+            .service(new_folder)
     })
     .bind(("0.0.0.0", port))?
     .run()
@@ -112,7 +113,7 @@ pub async fn https_router(
             .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
-            .service(fs::Files::new("/api", "./src/www2").show_files_listing())
+            .service(fs::Files::new("/cdn", "./src/www2").show_files_listing())
             .service(fs::Files::new("/static", ".").show_files_listing())
             .service(normalize_css)
             .service(skeleton_css)
@@ -125,6 +126,7 @@ pub async fn https_router(
             .service(favicon)
             .service(all)
             .service(get_file)
+            .service(new_folder)
     })
     .bind_rustls_0_23(("0.0.0.0", 8443), tls_config)?
     .workers(2)

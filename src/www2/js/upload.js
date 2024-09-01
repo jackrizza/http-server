@@ -2,7 +2,7 @@ function upload_overlay() {
   /* Upload Input */
   let upload_input = document.createElement("input");
   upload_input.type = "file";
-  upload_input.name = "payload";
+  upload_input.name = "file";
 
   let upload_group = document.createElement("div");
   upload_group.classList = "input-group";

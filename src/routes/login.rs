@@ -32,7 +32,7 @@ pub async fn post_login(
         match session.insert("session", session_id) {
             Ok(_) => {
                 return HttpResponse::SeeOther()
-                    .insert_header((LOCATION, "/#/"))
+                    .insert_header((LOCATION, "/#/."))
                     .finish()
             }
             Err(_) => {
