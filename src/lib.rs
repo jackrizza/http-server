@@ -9,6 +9,11 @@ use datastore::DataStore;
 use actix_session::config::{BrowserSession, CookieContentSecurity};
 use actix_web;
 
+use routes::cdn::{
+    cpp, cs, css, css_app, css_foundation, csv, dwg, favicon, file, folder, html, img, jpg, js,
+    js_app, js_login, js_navagation, js_show_file, js_table_builder, js_upload, json, pdf, php,
+    png, sql, txt, word, xls,
+};
 use routes::files::{all, get_file, new_folder};
 use routes::landing::landing;
 use routes::login::{login, post_login};
@@ -32,17 +37,6 @@ fn session_middleware() -> SessionMiddleware<CookieSessionStore> {
         .build()
 }
 
-#[get("/favicon.ico")]
-pub async fn favicon() -> impl Responder {
-    let image_content = match web::block(|| std::fs::read("src/www2/icons/favicon.ico")).await {
-        Ok(image) => image.unwrap(),
-        _ => Vec::new(),
-    };
-    HttpResponse::Ok()
-        .content_type("image/jpeg")
-        .body(image_content)
-}
-
 pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
     let ds = web::Data::new(ds.clone());
 
@@ -53,8 +47,8 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
-            .service(fs::Files::new("/cdn", "./src/www2").show_files_listing())
-            .service(fs::Files::new("/static", ".").show_files_listing())
+            // .service(fs::Files::new("/cdn", "./src/www2").show_files_listing())
+            // .service(fs::Files::new("/static", ".").show_files_listing())
             .service(normalize_css)
             .service(skeleton_css)
             .service(get_upload_file)
@@ -67,6 +61,33 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .service(all)
             .service(get_file)
             .service(new_folder)
+            .service(css_app)
+            .service(css_foundation)
+            .service(js_app)
+            .service(js_login)
+            .service(js_navagation)
+            .service(js_show_file)
+            .service(js_table_builder)
+            .service(js_upload)
+            .service(cpp)
+            .service(cs)
+            .service(css)
+            .service(csv)
+            .service(dwg)
+            .service(file)
+            .service(folder)
+            .service(html)
+            .service(img)
+            .service(jpg)
+            .service(js)
+            .service(json)
+            .service(pdf)
+            .service(php)
+            .service(png)
+            .service(sql)
+            .service(txt)
+            .service(word)
+            .service(xls)
     })
     .bind(("0.0.0.0", port))?
     .run()
@@ -113,8 +134,8 @@ pub async fn https_router(
             .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
-            .service(fs::Files::new("/cdn", "./src/www2").show_files_listing())
-            .service(fs::Files::new("/static", ".").show_files_listing())
+            // .service(fs::Files::new("/cdn", "./src/www2").show_files_listing())
+            // .service(fs::Files::new("/static", ".").show_files_listing())
             .service(normalize_css)
             .service(skeleton_css)
             .service(get_upload_file)
@@ -127,6 +148,33 @@ pub async fn https_router(
             .service(all)
             .service(get_file)
             .service(new_folder)
+            .service(css_app)
+            .service(css_foundation)
+            .service(js_app)
+            .service(js_login)
+            .service(js_navagation)
+            .service(js_show_file)
+            .service(js_table_builder)
+            .service(js_upload)
+            .service(cpp)
+            .service(cs)
+            .service(css)
+            .service(csv)
+            .service(dwg)
+            .service(file)
+            .service(folder)
+            .service(html)
+            .service(img)
+            .service(jpg)
+            .service(js)
+            .service(json)
+            .service(pdf)
+            .service(php)
+            .service(png)
+            .service(sql)
+            .service(txt)
+            .service(word)
+            .service(xls)
     })
     .bind_rustls_0_23(("0.0.0.0", 8443), tls_config)?
     .workers(2)
