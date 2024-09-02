@@ -8,24 +8,6 @@ use crate::datastore::DataStore;
 
 use crate::auth::auth_chain;
 
-#[get("/upload_file")]
-pub async fn get_upload_file(data: web::Data<DataStore>, session: Session) -> impl Responder {
-    let mut ds = data.as_ref().clone();
-    let key = match session.get::<String>("session") {
-        Ok(Some(key)) => key,
-        _ => "".to_string(),
-    };
-    println!("key : {}", key);
-    if !auth_chain(key, &mut ds).await {
-        return HttpResponse::SeeOther()
-            .insert_header((LOCATION, "/login"))
-            .finish();
-    }
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(include_str!("../www/upload.html"))
-}
-
 #[derive(Debug, MultipartForm)]
 struct UploadForm {
     #[multipart(limit = "100MB")]

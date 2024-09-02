@@ -17,8 +17,7 @@ use routes::cdn::{
 use routes::files::{all, get_file, new_folder};
 use routes::landing::landing;
 use routes::login::{login, post_login};
-use routes::upload::{get_upload_file, post_upload_file};
-use routes::{normalize_css, skeleton_css};
+use routes::upload::post_upload_file;
 
 pub mod auth;
 pub mod datastore;
@@ -47,12 +46,6 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
-            // .service(fs::Files::new("/cdn", "./src/www2").show_files_listing())
-            // .service(fs::Files::new("/static", ".").show_files_listing())
-            .service(normalize_css)
-            .service(skeleton_css)
-            .service(get_upload_file)
-            // .route("/upload_file", web::get().to( || get_upload_file(&mut ds)))
             .service(post_upload_file)
             .service(landing)
             .service(login)
@@ -134,12 +127,6 @@ pub async fn https_router(
             .app_data(ds.clone())
             .wrap(session_middleware())
             .wrap(Logger::default())
-            // .service(fs::Files::new("/cdn", "./src/www2").show_files_listing())
-            // .service(fs::Files::new("/static", ".").show_files_listing())
-            .service(normalize_css)
-            .service(skeleton_css)
-            .service(get_upload_file)
-            // .route("/upload_file", web::get().to( || get_upload_file(&mut ds)))
             .service(post_upload_file)
             .service(landing)
             .service(login)

@@ -18,5 +18,5 @@ pub async fn landing(data: web::Data<DataStore>, session: Session) -> impl Respo
     }
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(include_str!("../www2/index.html"))
+        .body(include_str!("../www/index.html"))
 }

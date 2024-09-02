@@ -1,28 +1,106 @@
 <!doctype html>
-<html>
+<html lang="en" dir="ltr">
     <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Simple HTTP Server</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <link rel="stylesheet" href="/css/normalize.css" />
-        <link rel="stylesheet" href="/css/skeleton.css" />
+        <link rel="stylesheet" href="/cdn/css/foundation.css" />
+        <link rel="stylesheet" href="/cdn/css/app.css" />
     </head>
-    <body class="container">
-        <h2>Simple HTTP Server</h2>
-        <p>This is a small project that works much like pythons http server.
-        It can be used to serve files and also be used to upload files.</p>
-        <p>This should not be used in a professional setting but for quick file sharing</p>
-        <p>
-            <b>to get started either click on :</b>
-            <ul>
-                <li>
-                    static files - <a href="/static">click here</a>
-                </li>
-                <li>
-                    upload files - <a href="/upload_file">click here</a>
-                </li>
-            </ul>
-        </p>
+    <body>
+
+        <div id="app"></div>
+
+        <script src="/cdn/js/navagation.js"></script>
+        <script src="/cdn/js/upload.js"></script>
+        <script src="/cdn/js/show_file.js"></script>
+        <script src="/cdn/js/table_builder.js"></script>
+
+        <script defer src="/cdn/js/app.js"></script>
     </body>
+    <footer class="marketing-site-footer">
+        <div class="row medium-unstack">
+            <div class="medium-4 columns">
+                <p>
+                    this is a small project that works much like pythons
+                    http server. It can be used to serve files and also be
+                    used to upload files.
+                </p>
+            </div>
+            <div class="medium-4 columns">
+                <h4 class="marketing-site-footer-title">Attributes</h4>
+                <div class="marketing-site-footer-block">
+                    <a
+                        href="https://www.flaticon.com/free-icons/pdf"
+                        title="pdf icons"
+                        >Pdf icons created by Roman Káčerek - Flaticon</a
+                    >
+                </div>
+
+                <div class="marketing-site-footer-block">
+                    <a
+                        href="https://www.flaticon.com/free-icons/jpg"
+                        title="jpg icons"
+                        >Jpg icons created by Dimitry Miroliubov -
+                        Flaticon</a
+                    >
+                </div>
+
+                <div class="marketing-site-footer-block">
+                    <a
+                        href="https://www.flaticon.com/free-icons/img"
+                        title="img icons"
+                        >Img icons created by Muhammad Atif - Flaticon</a
+                    >
+                </div>
+
+                <div class="marketing-site-footer-block">
+                    <a
+                        href="https://www.flaticon.com/free-icons/video"
+                        title="video icons"
+                        >Video icons created by Shuvo.Das - Flaticon</a
+                    >
+                </div>
+
+                <div class="marketing-site-footer-block">
+                    <a
+                        href="https://www.flaticon.com/free-icons/json-file"
+                        title="json file icons"
+                        >Json file icons created by Smashicons - Flaticon</a
+                    >
+                </div>
+                <div class="marketing-site-footer-block">
+                    <a
+                        href="https://www.flaticon.com/free-icons/file-extension"
+                        title="file extension icons"
+                        >File extension icons created by iconixar - Flaticon</a
+                    >
+            </div>
+        </div>
+        <div class="marketing-site-footer-bottom">
+            <div class="row large-unstack align-middle">
+                <div class="column">
+                    <!-- <p>&copy; 2017 No rights reserved</p> -->
+                </div>
+                <div class="column">
+                    <ul class="menu marketing-site-footer-bottom-links">
+                        <li><a href="#">Github</a></li>
+                        <!-- <li><a href="#">About</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">Works</a></li>
+                        <li><a href="#">News</a></li>
+                        <li><a href="#">Contact</a></li> -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+    let url = window.location.href;
+    let url_split = url.split("#");
+    if (url_split.length == 1) {
+        window.location.href = "/#/";
+    }
+    </script>
 </html>
