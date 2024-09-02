@@ -96,4 +96,11 @@
             </div>
         </div>
     </footer>
+    <script>
+    let url = window.location.href;
+    let url_split = url.split("#");
+    if (url_split.length == 1) {
+        window.location.href = "/#/";
+    }
+    </script>
 </html>
