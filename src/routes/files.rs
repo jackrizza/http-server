@@ -9,7 +9,7 @@ use chrono::offset::Utc;
 use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use walkdir::WalkDir;
+
 #[derive(Debug, Serialize, Deserialize)]
 enum About {
     File(Single),
@@ -84,47 +84,50 @@ pub async fn get_file(
     Ok(NamedFile::open(tail)?)
 }
 
-#[get("/files")]
-pub async fn all(data: web::Data<DataStore>, session: Session) -> impl Responder {
+#[get("/files/{tail:.*}")]
+pub async fn all(req: HttpRequest, data: web::Data<DataStore>, session: Session) -> impl Responder {
     let mut ds = data.as_ref().clone();
     let key = match session.get::<String>("session") {
         Ok(Some(key)) => key,
         _ => "".to_string(),
     };
+
+    let mut files = Files::new();
+
     if !auth_chain(key, &mut ds).await {
         // return HttpResponse::SeeOther()
         //     .insert_header((LOCATION, "/login"))
         //     .finish();
+        return web::Json(Files::new());
     }
 
-    let mut files = Files::new();
+    let tail: String = req
+        .match_info()
+        .get("tail")
+        .unwrap_or("".into())
+        .parse()
+        .unwrap_or("".into());
 
-    for entry in WalkDir::new(".") {
-        let entry = entry.unwrap();
-        let file_type = entry.file_type();
+    println!("tail: {:#?}", tail);
 
-        if file_type.is_dir() {
-            files.0.push(About::Folder(Single {
-                name: entry.file_name().to_str().unwrap().to_string(),
-                created: String::new(),
-                path: entry.path().display().to_string(),
-            }));
-        }
+    for path in fs::read_dir(format!("./{}", tail)).unwrap() {
+        let p: String = path.unwrap().path().display().to_string();
+        let name = p.split("/").last().unwrap().to_string();
+        let is_file = fs::metadata(p.clone()).unwrap().is_file();
+        let created = fs::metadata(p.clone()).unwrap().created().unwrap();
+        let created = DateTime::<Utc>::from(created).to_rfc2822();
 
-        if file_type.is_file() {
-            let metadata = fs::metadata(entry.path().display().to_string());
-            let created = match metadata {
-                Ok(meta) => {
-                    let system_time = meta.created().unwrap();
-                    let datetime: DateTime<Utc> = system_time.into();
-                    format!("{}", datetime.format("%d/%m/%Y %T"))
-                }
-                _ => String::new(),
-            };
+        if is_file {
             files.0.push(About::File(Single {
-                name: entry.file_name().to_str().unwrap().to_string(),
+                name,
                 created,
-                path: entry.path().display().to_string(),
+                path: p,
+            }));
+        } else {
+            files.0.push(About::Folder(Single {
+                name,
+                created,
+                path: p,
             }));
         }
     }

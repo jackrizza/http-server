@@ -88,7 +88,9 @@ function table_builder() {
   if (current_path.length > 0 || current_path == ".") {
     table_body.appendChild(create_table_row("..", "folder", "", ".."));
   }
-  fetch("/files")
+
+  console.log(current_path);
+  fetch("/files/" + current_path)
     .then((data) => data.json())
     .then((data) => {
       data.forEach((d) => {
