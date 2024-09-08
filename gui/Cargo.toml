@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 backend = { path = "../backend" }
-tray-item = "0.10.0"
+# tray-item = "0.10.0"

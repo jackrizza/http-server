@@ -111,8 +111,18 @@ pub async fn all(req: HttpRequest, data: web::Data<DataStore>, session: Session)
         let p: String = path.unwrap().path().display().to_string();
         let name = p.split("/").last().unwrap().to_string();
         let is_file = fs::metadata(p.clone()).unwrap().is_file();
-        let created = fs::metadata(p.clone()).unwrap().created().unwrap();
-        let created = DateTime::<Utc>::from(created).to_rfc2822();
+        let created = fs::metadata(p.clone());
+        let created = match created {
+            Ok(created) => {
+                let created = created.created();
+                match created {
+                    Ok(created) => 
+                    DateTime::<Utc>::from(created).to_rfc2822(),
+                    _ => "".into()
+                }
+            },
+            _ => "".into()
+        };
 
         if is_file {
             files.0.push(About::File(Single {
