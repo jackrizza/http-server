@@ -38,6 +38,8 @@ const EXTENSIONS = [
 function table_container() {
   let table_container = document.createElement("div");
   table_container.classList = "table-container";
+  table_container.setAttribute("ondrop", "dropHandler(event);");
+  table_container.setAttribute("ondragover", "dragOverHandler(event);");
   let table = document.createElement("table");
   table.classList = "dashboard-table";
   let colgroup = document.createElement("colgroup");
@@ -89,7 +91,7 @@ function table_builder() {
     table_body.appendChild(create_table_row("..", "folder", "", ".."));
   }
 
-  console.log(current_path);
+  // console.log(current_path);
   fetch("/files/" + current_path)
     .then((data) => data.json())
     .then((data) => {
@@ -187,12 +189,12 @@ function create_table_row(file_name, file_type, file_date, file_path) {
   row.dataset.goto = file_path;
   if (file_type == "folder") {
     row.onclick = function (e) {
-      console.log(e.target.dataset.goto);
+      // console.log(e.target.dataset.goto);
       goto_folder(e.target.dataset.goto);
     };
   } else {
     row.onclick = function (e) {
-      console.log(e.target.dataset.goto);
+      // console.log(e.target.dataset.goto);
       show_file(e.target.dataset.goto);
     };
   }

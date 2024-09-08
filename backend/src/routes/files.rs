@@ -95,9 +95,6 @@ pub async fn all(req: HttpRequest, data: web::Data<DataStore>, session: Session)
     let mut files = Files::new();
 
     if !auth_chain(key, &mut ds).await {
-        // return HttpResponse::SeeOther()
-        //     .insert_header((LOCATION, "/login"))
-        //     .finish();
         return web::Json(Files::new());
     }
 

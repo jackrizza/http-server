@@ -58,3 +58,57 @@ function upload_overlay() {
 
   document.body.appendChild(overlay);
 }
+
+function dropHandler(ev) {
+  console.log("File(s) dropped");
+
+  // Prevent default behavior (Prevent file from being opened)
+  ev.preventDefault();
+
+  if (ev.dataTransfer.items) {
+    // Use DataTransferItemList interface to access the file(s)
+    [...ev.dataTransfer.items].forEach((item, i) => {
+      // If dropped items aren't files, reject them
+      if (item.kind === "file") {
+        const file = item.getAsFile();
+        console.log(`… file[${i}].name = ${file.name}`);
+        hiddenFormUpload(file);
+      }
+    });
+  } else {
+    // Use DataTransfer interface to access the file(s)
+    [...ev.dataTransfer.files].forEach((file, i) => {
+      console.log(`… file[${i}].name = ${file.name}`);
+      hiddenFormUpload(file);
+    });
+  }
+}
+
+function dragOverHandler(ev) {
+  console.log("File(s) in drop zone", ev);
+
+  document.querySelector(".table-container").classList.add("dragover");
+
+  // Prevent default behavior (Prevent file from being opened)
+  ev.preventDefault();
+}
+
+function hiddenFormUpload(file) {
+  // create a shadow form with the file input
+  let url = location.href.split(location.host)[1];
+  let current_path = url.split("#/");
+
+  let data = new FormData();
+  console.log(file.name);
+  data.append("file", file);
+  data.append("path", current_path[current_path.length - 1]);
+
+  fetch("/upload_file", {
+    method: "POST",
+    enctype: "multipart/form-data",
+    body: data,
+  }).then(() => {
+    console.log("File uploaded");
+    location.reload();
+  });
+}

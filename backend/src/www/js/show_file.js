@@ -26,6 +26,9 @@ function show_file(path) {
   if (ext == "json") {
     frame.type = "application/json";
   }
+  if (ext == "js") {
+    frame.type = "application/javascript";
+  }
 
   /* Top Bar */
   let topbar = document.createElement("div");

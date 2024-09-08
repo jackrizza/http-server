@@ -18,42 +18,42 @@ pub async fn css_foundation() -> impl Responder {
 #[get("/cdn/js/app.js")]
 pub async fn js_app() -> impl Responder {
     HttpResponse::Ok()
-        .content_type("text/css; charset=utf-8")
+        .content_type("application/javascript; charset=utf-8")
         .body(include_str!("../www/js/app.js"))
 }
 
 #[get("/cdn/js/login.js")]
 pub async fn js_login() -> impl Responder {
     HttpResponse::Ok()
-        .content_type("text/css; charset=utf-8")
+        .content_type("application/javascript; charset=utf-8")
         .body(include_str!("../www/js/login.js"))
 }
 
 #[get("/cdn/js/navagation.js")]
 pub async fn js_navagation() -> impl Responder {
     HttpResponse::Ok()
-        .content_type("text/css; charset=utf-8")
+        .content_type("application/javascript; charset=utf-8")
         .body(include_str!("../www/js/navagation.js"))
 }
 
 #[get("/cdn/js/show_file.js")]
 pub async fn js_show_file() -> impl Responder {
     HttpResponse::Ok()
-        .content_type("text/css; charset=utf-8")
+        .content_type("application/javascript; charset=utf-8")
         .body(include_str!("../www/js/show_file.js"))
 }
 
 #[get("/cdn/js/table_builder.js")]
 pub async fn js_table_builder() -> impl Responder {
     HttpResponse::Ok()
-        .content_type("text/css; charset=utf-8")
+        .content_type("application/javascript; charset=utf-8")
         .body(include_str!("../www/js/table_builder.js"))
 }
 
 #[get("/cdn/js/upload.js")]
 pub async fn js_upload() -> impl Responder {
     HttpResponse::Ok()
-        .content_type("text/css; charset=utf-8")
+        .content_type("application/javascript; charset=utf-8")
         .body(include_str!("../www/js/upload.js"))
 }
 

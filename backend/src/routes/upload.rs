@@ -21,6 +21,7 @@ pub async fn post_upload_file(
     data: web::Data<DataStore>,
     session: Session,
 ) -> impl Responder {
+    println!("upload file : {:#?}", form);
     let key = match session.get::<String>("session") {
         Ok(Some(key)) => key,
         _ => "".to_string(),

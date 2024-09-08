@@ -145,6 +145,7 @@ form .form-icons .fa {
 .table-container {
     margin: 2%;
     min-height: 100vh;
+    transition: all 0.5s ease;
 }
 
 .dashboard-table {
