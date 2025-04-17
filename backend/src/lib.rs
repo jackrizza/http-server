@@ -14,7 +14,7 @@ use routes::cdn::{
     js_app, js_login, js_navagation, js_show_file, js_table_builder, js_upload, json, pdf, php,
     png, sql, txt, word, xls,
 };
-use routes::files::{all, get_file, new_folder};
+use routes::files::{all, get_file, get_video, new_folder};
 use routes::landing::landing;
 use routes::login::{login, post_login};
 use routes::upload::post_upload_file;
@@ -53,6 +53,7 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
             .service(favicon)
             .service(all)
             .service(get_file)
+            .service(get_video)
             .service(new_folder)
             .service(css_app)
             .service(css_foundation)
@@ -134,6 +135,7 @@ pub async fn https_router(
             .service(favicon)
             .service(all)
             .service(get_file)
+            .service(get_video)
             .service(new_folder)
             .service(css_app)
             .service(css_foundation)

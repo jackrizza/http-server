@@ -5,4 +5,9 @@ edition = "2021"
 
 [dependencies]
 backend = { path = "../backend" }
-# tray-item = "0.10.0"
+eframe = "0.28.1"
+egui = "0.28.1"
+image = "0.25.6"
+rfd = "0.14.1"
+run_shell = "0.1.13"
+tray-icon = "0.20.0"

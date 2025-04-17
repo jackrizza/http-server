@@ -4,11 +4,13 @@ use actix_files::NamedFile;
 use actix_multipart::form::{text::Text, MultipartForm};
 use actix_session::Session;
 use actix_web::http::header::LOCATION;
+use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder, Result};
 use chrono::offset::Utc;
 use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize, Deserialize)]
 enum About {
@@ -84,6 +86,26 @@ pub async fn get_file(
     Ok(NamedFile::open(tail)?)
 }
 
+#[get("/get/video/{filename:.*}")]
+async fn get_video(path: web::Path<String>) -> Result<NamedFile> {
+    let filename = path.into_inner();
+    let full_path: PathBuf = PathBuf::from(".").join(&filename);
+
+    // NamedFile implements Responder, handles Range → 206, sniffing MIME, sendfile, etc.
+    Ok(
+        NamedFile::open(full_path)?
+            .use_last_modified(true)
+            .set_content_disposition(
+                actix_web::http::header::ContentDisposition {
+                    disposition: actix_web::http::header::DispositionType::Inline,
+                    parameters: vec![
+                        actix_web::http::header::DispositionParam::Filename(filename)
+                    ],
+                }
+            )
+    )
+}
+
 #[get("/files/{tail:.*}")]
 pub async fn all(req: HttpRequest, data: web::Data<DataStore>, session: Session) -> impl Responder {
     let mut ds = data.as_ref().clone();
@@ -116,12 +138,11 @@ pub async fn all(req: HttpRequest, data: web::Data<DataStore>, session: Session)
             Ok(created) => {
                 let created = created.created();
                 match created {
-                    Ok(created) => 
-                    DateTime::<Utc>::from(created).to_rfc2822(),
-                    _ => "".into()
+                    Ok(created) => DateTime::<Utc>::from(created).to_rfc2822(),
+                    _ => "".into(),
                 }
-            },
-            _ => "".into()
+            }
+            _ => "".into(),
         };
 
         if is_file {

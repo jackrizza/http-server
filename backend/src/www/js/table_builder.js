@@ -53,16 +53,30 @@ function table_container() {
   let tr = document.createElement("tr");
   let th1 = document.createElement("th");
   let a1 = document.createElement("a");
-  a1.href = "#";
+  // a1.href = "#";
   a1.innerText = "Name";
+  a1.dataset.ascending = true;
+  a1.onclick = (ev) => {
+    ev.preventDefault();
+    a1.dataset.ascending = !ev.target.dataset.ascending;
+    console.log(ev);
+    table_builder(filter_by_date, ev.target.dataset.ascending);
+  };
   let i1 = document.createElement("i");
   i1.classList = "fa fa-caret-down";
   a1.appendChild(i1);
   th1.appendChild(a1);
   let th2 = document.createElement("th");
   let a2 = document.createElement("a");
-  a2.href = "#";
+  // a2.href = "#";
   a2.innerText = "Date";
+  a2.dataset.ascending = true;
+  a2.onclick = (ev) => {
+    ev.preventDefault();
+    a2.dataset.ascending = !ev.target.dataset.ascending;
+    console.log(ev);
+    table_builder(filter_by_date, ev.target.dataset.ascending);
+  };
   let i2 = document.createElement("i");
   i2.classList = "fa fa-caret-down";
   a2.appendChild(i2);
@@ -80,7 +94,54 @@ function table_container() {
   return table_container;
 }
 
-function table_builder() {
+function folders_first(files) {
+  return files.sort((a, b) => {
+    if (a.File == undefined && b.File != undefined) {
+      return -1;
+    }
+    if (a.File != undefined && b.File == undefined) {
+      return 1;
+    }
+  });
+}
+
+function filter_by_name(files, ascending) {
+  if (ascending) {
+    return files.sort((a, b) => {
+      let interal_a = a.File == undefined ? a.Folder : a.File;
+      let interal_b = b.File == undefined ? b.Folder : b.File;
+      return interal_a.name.localeCompare(interal_b.name);
+    });
+  }
+  return files
+    .sort((a, b) => {
+      let interal_a = a.File == undefined ? a.Folder : a.File;
+      let interal_b = b.File == undefined ? b.Folder : b.File;
+      return interal_b.name.localeCompare(interal_a.name);
+    })
+    .reverse();
+
+  // if
+}
+
+function filter_by_date(files, ascending) {
+  if (ascending) {
+    return files.sort((a, b) => {
+      let interal_a = a.File == undefined ? a.Folder : a.File;
+      let interal_b = b.File == undefined ? b.Folder : b.File;
+      return interal_a.created.localeCompare(interal_b.created);
+    });
+  }
+  return files
+    .sort((a, b) => {
+      let interal_a = a.File == undefined ? a.Folder : a.File;
+      let interal_b = b.File == undefined ? b.Folder : b.File;
+      return interal_b.created.localeCompare(interal_a.created);
+    })
+    .reverse();
+}
+
+function table_builder(filter = undefined, ascending = true) {
   let table_body = document.getElementById("table_body");
   table_body.innerHTML = "";
 
@@ -95,6 +156,11 @@ function table_builder() {
   fetch("/files/" + current_path)
     .then((data) => data.json())
     .then((data) => {
+      data = folders_first(data);
+      if (filter != undefined) {
+        console.log(`filtering in ${ascending ? "ascending" : "descending"}`);
+        data = filter(data, ascending);
+      }
       data.forEach((d) => {
         let file_path = d.File == undefined ? d.Folder.path : d.File.path;
         let new_file_path = file_path.split("/");

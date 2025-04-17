@@ -1,33 +1,125 @@
+const CODE_EXTENSIONS = [
+  "js",
+  "rs",
+  "py",
+  "java",
+  "c",
+  "cpp",
+  "html",
+  "css",
+  "scss",
+  "json",
+  "xml",
+  "yaml",
+  "yml",
+  "sh",
+  "sql",
+  "php",
+  "rb",
+  "go",
+  "ts",
+  "tsx",
+  "jsx",
+  "md",
+  "markdown",
+  "csv",
+  "txt",
+  "log",
+  "conf",
+  "ini",
+  "cfg",
+  "env",
+  "htaccess",
+  "gitignore",
+  "dockerignore",
+  "dockerfile",
+  "gitattributes",
+  "gitmodules",
+  "gitconfig",
+  "gitkeep",
+  "gitlog",
+  "gitmessage",
+];
+
+const VIDEO_EXTENSIONS = [
+  "mp4",
+  "mkv",
+  "webm",
+  "avi",
+  "mov",
+  "MOV",
+  "wmv",
+  "flv",
+  "mpeg",
+  "mpg",
+  "3gp",
+  "3g2",
+  "m4v",
+]
+
 function show_file(path) {
   if (path == undefined) {
     return;
   }
 
+  let frame = document.createElement("code");
+  frame.id = "file_preview";
   let ext = path.split(".");
   ext = ext[ext.length - 1];
+  if (CODE_EXTENSIONS.includes(ext)) {
+    frame.classList = `prettyprint`;
+    frame.innerText = "Loading...";
+    /* File */
+    fetch("/get/file/" + path)
+      .then((data) => data.text())
+      .then((data) => {
+        console.log(data);
+        document.getElementById("file_preview").innerText = data;
+        PR.prettyPrint();
+      });
+  } else if (VIDEO_EXTENSIONS.includes(ext)) {
+    /* Video */
+    const cleanPath = path.replace(/^\.\//, "");
 
-  /* File */
-  let frame = document.createElement("object");
-  frame.classList = "file-frame";
-  frame.data = "/get/file/" + path;
-  frame.type = "text/plain";
-  if (ext == "pdf") {
-    frame.type = "application/pdf";
-  }
-  if (ext == "png") {
-    frame.type = "image/png";
-  }
-  if (ext == "jpg" || ext == "jpeg") {
-    frame.type = "image/jpeg";
-  }
-  if (ext == "csv") {
-    frame.type = "text/csv";
-  }
-  if (ext == "json") {
-    frame.type = "application/json";
-  }
-  if (ext == "js") {
-    frame.type = "application/javascript";
+    frame = document.createElement("video");
+    frame.className = "file-frame";
+    frame.controls = true;
+    frame.preload = "none";             // ← only metadata
+    // (optional) use <source>:
+    const source = document.createElement("source");
+    source.src = `/get/video/${encodeURIComponent(cleanPath)}`;
+    // source.type = `video/${ext}`;
+    frame.appendChild(source);
+
+    // update download link to hit your video route
+
+  } else {
+    /* File */
+    frame = document.createElement("object");
+    frame.classList = "file-frame";
+    frame.data = "/get/file/" + path;
+    frame.type = "text/plain";
+    switch (ext) {
+      case "pdf":
+        frame.type = "application/pdf";
+        break;
+      case "png":
+        frame.type = "image/png";
+        break;
+      case "jpg":
+      case "jpeg":
+        frame.type = "image/jpeg";
+        break;
+      case "csv":
+        frame.type = "text/csv";
+        break;
+      case "json":
+        frame.type = "application/json";
+        break;
+      case "js":
+        frame.type = "application/javascript";
+        break;
+    }
   }
 
   /* Top Bar */
@@ -66,4 +158,13 @@ function show_file(path) {
   div.appendChild(frame);
 
   document.body.appendChild(div);
+
+  if (frame.tagName === "VIDEO") {
+    frame.load();
+    frame.preload = "metadata";
+    frame.addEventListener("loadedmetadata", () => {
+      // Jump to a tiny fraction into the file…
+      frame.currentTime = 0.1;
+    });
+  }
 }
