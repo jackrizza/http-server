@@ -1,8 +1,7 @@
-use actix_files as fs;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::Logger;
-use actix_web::{get, web, App, HttpResponse, Responder};
+use actix_web::{web, App};
 use actix_web::{HttpServer, Result};
 use datastore::DataStore;
 

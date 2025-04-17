@@ -1,6 +1,6 @@
 use actix_session::Session;
 use actix_web::http::header::LOCATION;
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{post, web, HttpResponse, Responder};
 
 use actix_multipart::form::{tempfile::TempFile, text::Text, MultipartForm};
 

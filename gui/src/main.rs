@@ -3,7 +3,7 @@
 use std::{cell::RefCell, rc::Rc};
 use std::{
     io::{BufRead, BufReader},
-    process::{Command, Output, Stdio},
+    process::{Command, Stdio},
     sync::mpsc::{Receiver, Sender},
     thread::{self, JoinHandle},
 };
@@ -55,7 +55,6 @@ struct MyApp {
     toggle_show: bool,
     running: Option<JoinHandle<()>>,
     log: Vec<String>,
-    should_kill: bool,
     output_rx: Option<Receiver<String>>,
 }
 
@@ -65,7 +64,6 @@ impl Default for MyApp {
             toggle_show: false,
             running: None,
             log: Vec::new(),
-            should_kill: false,
             output_rx: None,
         }
     }
