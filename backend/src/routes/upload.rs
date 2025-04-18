@@ -1,6 +1,6 @@
 use actix_session::Session;
 use actix_web::http::header::LOCATION;
-use actix_web::{post, web, HttpResponse, Responder};
+use actix_web::{post, web, HttpResponse, Responder, HttpRequest};
 
 use actix_multipart::form::{tempfile::TempFile, text::Text, MultipartForm};
 
@@ -17,6 +17,7 @@ struct UploadForm {
 
 #[post("/upload_file")]
 pub async fn post_upload_file(
+    req: HttpRequest,
     MultipartForm(form): MultipartForm<UploadForm>,
     data: web::Data<DataStore>,
     session: Session,
@@ -28,7 +29,7 @@ pub async fn post_upload_file(
     };
 
     let mut ds = data.as_ref().clone();
-    if !auth_chain(key, &mut ds).await {
+    if !auth_chain(req, key, &mut ds).await {
         return HttpResponse::SeeOther()
             .insert_header((LOCATION, "/login"))
             .finish();

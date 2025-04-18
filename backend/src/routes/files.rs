@@ -41,6 +41,7 @@ struct NewFolder {
 
 #[post("/api/new_folder")]
 pub async fn new_folder(
+    req: HttpRequest,
     MultipartForm(form): MultipartForm<NewFolder>,
     data: web::Data<DataStore>,
     session: Session,
@@ -51,7 +52,7 @@ pub async fn new_folder(
         Ok(Some(key)) => key,
         _ => "".to_string(),
     };
-    if !auth_chain(key, &mut ds).await {
+    if !auth_chain(req, key, &mut ds).await {
         return HttpResponse::SeeOther()
             .insert_header((LOCATION, "/login"))
             .finish();
@@ -76,7 +77,7 @@ pub async fn get_file(
         Ok(Some(key)) => key,
         _ => "".to_string(),
     };
-    if !auth_chain(key, &mut ds).await {
+    if !auth_chain(req.clone(), key, &mut ds).await {
         // return Err(ErrorUnauthorized("Access Denied"));
     }
 
@@ -111,7 +112,7 @@ pub async fn all(req: HttpRequest, data: web::Data<DataStore>, session: Session)
 
     let mut files = Files::new();
 
-    if !auth_chain(key, &mut ds).await {
+    if !auth_chain(req.clone(), key, &mut ds).await {
         return web::Json(Files::new());
     }
 
