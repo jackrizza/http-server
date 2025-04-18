@@ -1,6 +1,6 @@
-use clap::Parser;
 use backend::datastore::{DataStore, Op};
 use backend::{http_router, https_router};
+use clap::Parser;
 
 /// Simple HTTP server
 /// refer to https://github.com/jackrizza/http-server
@@ -19,7 +19,7 @@ struct Args {
     authenticate: bool,
 
     /// set password for authentication (required for authenticate flag)
-    #[arg(short, long, default_value_t = String::from(""))]
+    #[arg(short, long, required_if_eq("authenticate", "true"))]
     password: String,
 
     #[arg(long, default_value_t = String::from("key.pem"))]
@@ -36,15 +36,10 @@ async fn main() -> std::io::Result<()> {
     let mut datastore = DataStore::new();
     datastore.listen();
 
-    let is_password = || match args.password == "" {
-        true => panic!("Password is required"),
-        false => datastore.send(Op::Upsert("Password".into(), args.password)),
-    };
-
     match args.authenticate {
         true => {
             datastore.send(Op::Upsert("Authenticate".into(), "true".into()));
-            is_password();
+            datastore.send(Op::Upsert("Password".into(), args.password));
 
             https_router(&mut datastore, args.pem_file, args.cert_file).await
         }
