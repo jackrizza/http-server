@@ -35,51 +35,61 @@ fn session_middleware() -> SessionMiddleware<CookieSessionStore> {
         .build()
 }
 
+// 1) At the bottom of your file (or in a new module), extract all your handlers:
+pub fn configure_public(cfg: &mut web::ServiceConfig) {
+    cfg.service(login).service(post_login);
+}
+
+pub fn configure_protected_and_static(cfg: &mut web::ServiceConfig) {
+    // your “protected” endpoints
+    cfg.service(post_upload_file).service(landing);
+
+    // —plus all your static/file‐serving endpoints—
+    cfg.service(favicon)
+        .service(all)
+        .service(get_file)
+        .service(get_video)
+        .service(new_folder)
+        .service(css_app)
+        .service(css_foundation)
+        .service(js_app)
+        .service(js_login)
+        .service(js_navagation)
+        .service(js_show_file)
+        .service(js_table_builder)
+        .service(js_upload)
+        .service(cpp)
+        .service(cs)
+        .service(css)
+        .service(csv)
+        .service(dwg)
+        .service(file)
+        .service(folder)
+        .service(html)
+        .service(img)
+        .service(jpg)
+        .service(js)
+        .service(json)
+        .service(pdf)
+        .service(php)
+        .service(png)
+        .service(sql)
+        .service(txt)
+        .service(word)
+        .service(xls);
+}
+
 pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
     let ds = web::Data::new(ds.clone());
-
-    // configuration file or environment variables.
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     HttpServer::new(move || {
         App::new()
             .app_data(ds.clone())
             .wrap(Logger::default())
-            .service(login)
-            .service(post_login)
-            .service(post_upload_file)
-            .service(landing)
-            .service(favicon)
-            .service(all)
-            .service(get_file)
-            .service(get_video)
-            .service(new_folder)
-            .service(css_app)
-            .service(css_foundation)
-            .service(js_app)
-            .service(js_login)
-            .service(js_navagation)
-            .service(js_show_file)
-            .service(js_table_builder)
-            .service(js_upload)
-            .service(cpp)
-            .service(cs)
-            .service(css)
-            .service(csv)
-            .service(dwg)
-            .service(file)
-            .service(folder)
-            .service(html)
-            .service(img)
-            .service(jpg)
-            .service(js)
-            .service(json)
-            .service(pdf)
-            .service(php)
-            .service(png)
-            .service(sql)
-            .service(txt)
-            .service(word)
-            .service(xls)
+            // public + unprotected
+            .configure(configure_public)
+            // same handlers, but unwrapped (no AuthMiddleware here)
+            .configure(configure_protected_and_static)
     })
     .bind(("0.0.0.0", port))?
     .run()
@@ -92,7 +102,6 @@ pub async fn https_router(
     cert_file: String,
 ) -> std::io::Result<()> {
     let ds = web::Data::new(ds.clone());
-    // build TLS config from files
     rustls::crypto::aws_lc_rs::default_provider()
         .install_default()
         .unwrap();
@@ -102,7 +111,7 @@ pub async fn https_router(
 
     // load TLS certs and key
     // to create a self-signed temporary cert for testing:
-    // `openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365 -subj '/CN=localhost'`
+    // openssl req -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365 -subj '/CN=localhost'
     let tls_certs = rustls_pemfile::certs(&mut certs_file)
         .collect::<Result<Vec<_>, _>>()
         .unwrap();
@@ -116,55 +125,19 @@ pub async fn https_router(
         .with_no_client_auth()
         .with_single_cert(tls_certs, rustls::pki_types::PrivateKeyDer::Pkcs8(tls_key))
         .unwrap();
-
-    // configuration file or environment variables.
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-
-    // log::info!("starting HTTPS server at http://0.0.0.0:8443");
     HttpServer::new(move || {
         App::new()
             .app_data(ds.clone())
             .wrap(session_middleware())
-            .service(login)
-            .service(post_login)
+            // public always available
+            .configure(configure_public)
+            // everything else lives in an auth‑guarded scope
             .service(
                 web::scope("")
                     .wrap(auth::AuthMiddleware)
                     .wrap(Logger::default())
-                    .service(post_upload_file)
-                    .service(landing)
-                    .service(favicon)
-                    .service(all)
-                    .service(get_file)
-                    .service(get_video)
-                    .service(new_folder)
-                    .service(css_app)
-                    .service(css_foundation)
-                    .service(js_app)
-                    .service(js_login)
-                    .service(js_navagation)
-                    .service(js_show_file)
-                    .service(js_table_builder)
-                    .service(js_upload)
-                    .service(cpp)
-                    .service(cs)
-                    .service(css)
-                    .service(csv)
-                    .service(dwg)
-                    .service(file)
-                    .service(folder)
-                    .service(html)
-                    .service(img)
-                    .service(jpg)
-                    .service(js)
-                    .service(json)
-                    .service(pdf)
-                    .service(php)
-                    .service(png)
-                    .service(sql)
-                    .service(txt)
-                    .service(word)
-                    .service(xls),
+                    .configure(configure_protected_and_static),
             )
     })
     .bind_rustls_0_23(("0.0.0.0", 8443), tls_config)?
