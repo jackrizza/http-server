@@ -1,10 +1,16 @@
 [package]
 name = "cli"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 backend = { path = "../backend" }
-clap = { version = "4.5.16", features = ["derive"] }
-actix-web = { version = "4.9.0", features = ["rustls-0_23"] }
-tokio = { version = "1.39.3", features = ["full"] }
+clap = { version = "4.5.37", features = [
+    "derive",
+] } # latest minor on 4.x :contentReference[oaicite:0]{index=0}
+actix-web = { version = "4.10.2", features = [
+    "rustls-0_23",
+] } # current release in 4.10 series :contentReference[oaicite:1]{index=1}
+tokio = { version = "1.44.2", features = [
+    "full",
+] } # latest 1.x with “full” :contentReference[oaicite:2]{index=2}

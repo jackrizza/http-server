@@ -20,7 +20,7 @@ struct Args {
 
     /// set password for authentication (required for authenticate flag)
     #[arg(short, long, required_if_eq("authenticate", "true"))]
-    password: String,
+    password: Option<String>,
 
     #[arg(long, default_value_t = String::from("key.pem"))]
     pem_file: String,
@@ -38,8 +38,15 @@ async fn main() -> std::io::Result<()> {
 
     match args.authenticate {
         true => {
+            let password = match args.password {
+                Some(p) => p,
+                None => {
+                    println!("Password is required for authentication");
+                    return Ok(());
+                }
+            };
             datastore.send(Op::Upsert("Authenticate".into(), "true".into()));
-            datastore.send(Op::Upsert("Password".into(), args.password));
+            datastore.send(Op::Upsert("Password".into(), password));
 
             https_router(&mut datastore, args.pem_file, args.cert_file).await
         }

@@ -1,7 +1,7 @@
-use actix_session::{storage::CookieSessionStore, SessionMiddleware};
+use actix_session::{SessionMiddleware, storage::CookieSessionStore};
 use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::Logger;
-use actix_web::{web, App};
+use actix_web::{App, web};
 use actix_web::{HttpServer, Result};
 use datastore::DataStore;
 
@@ -26,7 +26,7 @@ use std::{fs::File, io::BufReader};
 
 fn session_middleware() -> SessionMiddleware<CookieSessionStore> {
     SessionMiddleware::builder(CookieSessionStore::default(), Key::generate())
-        .cookie_name(String::from("simplehttpkey")) // arbitrary name
+        .cookie_name(String::from("http-server")) // arbitrary name
         .cookie_secure(true) // https only
         .session_lifecycle(BrowserSession::default()) // expire at end of session
         .cookie_same_site(SameSite::Strict)
@@ -43,12 +43,11 @@ pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(ds.clone())
-            .wrap(session_middleware())
             .wrap(Logger::default())
-            .service(post_upload_file)
-            .service(landing)
             .service(login)
             .service(post_login)
+            .service(post_upload_file)
+            .service(landing)
             .service(favicon)
             .service(all)
             .service(get_file)
@@ -126,43 +125,47 @@ pub async fn https_router(
         App::new()
             .app_data(ds.clone())
             .wrap(session_middleware())
-            .wrap(Logger::default())
-            .service(post_upload_file)
-            .service(landing)
             .service(login)
             .service(post_login)
-            .service(favicon)
-            .service(all)
-            .service(get_file)
-            .service(get_video)
-            .service(new_folder)
-            .service(css_app)
-            .service(css_foundation)
-            .service(js_app)
-            .service(js_login)
-            .service(js_navagation)
-            .service(js_show_file)
-            .service(js_table_builder)
-            .service(js_upload)
-            .service(cpp)
-            .service(cs)
-            .service(css)
-            .service(csv)
-            .service(dwg)
-            .service(file)
-            .service(folder)
-            .service(html)
-            .service(img)
-            .service(jpg)
-            .service(js)
-            .service(json)
-            .service(pdf)
-            .service(php)
-            .service(png)
-            .service(sql)
-            .service(txt)
-            .service(word)
-            .service(xls)
+            .service(
+                web::scope("")
+                    .wrap(auth::AuthMiddleware)
+                    .wrap(Logger::default())
+                    .service(post_upload_file)
+                    .service(landing)
+                    .service(favicon)
+                    .service(all)
+                    .service(get_file)
+                    .service(get_video)
+                    .service(new_folder)
+                    .service(css_app)
+                    .service(css_foundation)
+                    .service(js_app)
+                    .service(js_login)
+                    .service(js_navagation)
+                    .service(js_show_file)
+                    .service(js_table_builder)
+                    .service(js_upload)
+                    .service(cpp)
+                    .service(cs)
+                    .service(css)
+                    .service(csv)
+                    .service(dwg)
+                    .service(file)
+                    .service(folder)
+                    .service(html)
+                    .service(img)
+                    .service(jpg)
+                    .service(js)
+                    .service(json)
+                    .service(pdf)
+                    .service(php)
+                    .service(png)
+                    .service(sql)
+                    .service(txt)
+                    .service(word)
+                    .service(xls),
+            )
     })
     .bind_rustls_0_23(("0.0.0.0", 8443), tls_config)?
     .workers(2)

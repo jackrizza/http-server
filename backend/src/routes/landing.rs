@@ -1,21 +1,7 @@
-use crate::auth::auth_chain;
-use crate::datastore::DataStore;
-use actix_session::Session;
-use actix_web::http::header::LOCATION;
-use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
+use actix_web::{get, HttpResponse, Responder};
 
 #[get("/")]
-pub async fn landing(req: HttpRequest, data: web::Data<DataStore>, session: Session) -> impl Responder {
-    let mut ds = data.as_ref().clone();
-    let key = match session.get::<String>("session") {
-        Ok(Some(key)) => key,
-        _ => "".to_string(),
-    };
-    if !auth_chain(req, key, &mut ds).await {
-        return HttpResponse::SeeOther()
-            .insert_header((LOCATION, "/login"))
-            .finish();
-    }
+pub async fn landing() -> impl Responder {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(include_str!("../www/index.html"))

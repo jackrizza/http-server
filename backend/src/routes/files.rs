@@ -1,8 +1,5 @@
-use crate::auth::auth_chain;
-use crate::datastore::DataStore;
 use actix_files::NamedFile;
 use actix_multipart::form::{text::Text, MultipartForm};
-use actix_session::Session;
 use actix_web::http::header::LOCATION;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder, Result};
 use chrono::offset::Utc;
@@ -40,23 +37,8 @@ struct NewFolder {
 }
 
 #[post("/api/new_folder")]
-pub async fn new_folder(
-    req: HttpRequest,
-    MultipartForm(form): MultipartForm<NewFolder>,
-    data: web::Data<DataStore>,
-    session: Session,
-) -> impl Responder {
+pub async fn new_folder(MultipartForm(form): MultipartForm<NewFolder>) -> impl Responder {
     println!("new folder : {:#?}", form);
-    let mut ds = data.as_ref().clone();
-    let key = match session.get::<String>("session") {
-        Ok(Some(key)) => key,
-        _ => "".to_string(),
-    };
-    if !auth_chain(req, key, &mut ds).await {
-        return HttpResponse::SeeOther()
-            .insert_header((LOCATION, "/login"))
-            .finish();
-    }
 
     let path = format!("./{}/{}", form.path.to_string(), form.name.to_string());
     fs::create_dir_all(path).unwrap();
@@ -67,20 +49,7 @@ pub async fn new_folder(
 }
 
 #[get("/get/file/{tail:.*}")]
-pub async fn get_file(
-    req: HttpRequest,
-    data: web::Data<DataStore>,
-    session: Session,
-) -> Result<NamedFile> {
-    let mut ds = data.as_ref().clone();
-    let key = match session.get::<String>("session") {
-        Ok(Some(key)) => key,
-        _ => "".to_string(),
-    };
-    if !auth_chain(req.clone(), key, &mut ds).await {
-        // return Err(ErrorUnauthorized("Access Denied"));
-    }
-
+pub async fn get_file(req: HttpRequest) -> Result<NamedFile> {
     let tail: String = req.match_info().get("tail").unwrap().parse().unwrap();
 
     Ok(NamedFile::open(tail)?)
@@ -103,18 +72,8 @@ async fn get_video(path: web::Path<String>) -> Result<NamedFile> {
 }
 
 #[get("/files/{tail:.*}")]
-pub async fn all(req: HttpRequest, data: web::Data<DataStore>, session: Session) -> impl Responder {
-    let mut ds = data.as_ref().clone();
-    let key = match session.get::<String>("session") {
-        Ok(Some(key)) => key,
-        _ => "".to_string(),
-    };
-
+pub async fn all(req: HttpRequest) -> impl Responder {
     let mut files = Files::new();
-
-    if !auth_chain(req.clone(), key, &mut ds).await {
-        return web::Json(Files::new());
-    }
 
     let tail: String = req
         .match_info()

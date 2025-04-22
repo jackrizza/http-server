@@ -1,23 +1,24 @@
 [package]
 name = "backend"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 actix-files = "0.6.6"
 actix-multipart = "0.7.2"
-actix-session = { version = "0.10.0", features = ["cookie-session"] }
-actix-web = { version = "4.9.0", features = ["rustls-0_23"] }
-rustls = "0.23"
-rustls-pemfile = "2"
-env_logger = "0.11.5"
+actix-session = {version = "0.10.1", features = ["cookie-session"]}
+actix-web = "4.10.2"
+rustls = "0.23.26"
+rustls-pemfile = "2.2.0"
+env_logger = "0.11.8"
 future-utils = "0.12.1"
-futures = "0.3.30"
-futures-util = "0.3.30"
+futures = "0.3.31"
+futures-util = "0.3.31"
 nanoid = "0.4.0"
-openssl = "0.10.66"
-serde = { version = "1.0.208", features = ["derive"] }
-tokio = { version = "1.39.3", features = ["full"] }
+openssl = "0.10.72"
+serde = {version = "1.0.219", features = ["derive"]}
+tokio = { version = "1.44.2", features = ["full"] }
 walkdir = "2.5.0"
-chrono = "0.4.38"
-bytes = "1.7.1"
+chrono = "0.4.40"
+bytes = "1.10.1"
+log = "0.4.27"

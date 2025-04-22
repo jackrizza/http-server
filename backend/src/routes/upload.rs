@@ -1,12 +1,7 @@
-use actix_session::Session;
 use actix_web::http::header::LOCATION;
-use actix_web::{post, web, HttpResponse, Responder, HttpRequest};
+use actix_web::{post, HttpResponse, Responder};
 
 use actix_multipart::form::{tempfile::TempFile, text::Text, MultipartForm};
-
-use crate::datastore::DataStore;
-
-use crate::auth::auth_chain;
 
 #[derive(Debug, MultipartForm)]
 struct UploadForm {
@@ -16,25 +11,7 @@ struct UploadForm {
 }
 
 #[post("/upload_file")]
-pub async fn post_upload_file(
-    req: HttpRequest,
-    MultipartForm(form): MultipartForm<UploadForm>,
-    data: web::Data<DataStore>,
-    session: Session,
-) -> impl Responder {
-    println!("upload file : {:#?}", form);
-    let key = match session.get::<String>("session") {
-        Ok(Some(key)) => key,
-        _ => "".to_string(),
-    };
-
-    let mut ds = data.as_ref().clone();
-    if !auth_chain(req, key, &mut ds).await {
-        return HttpResponse::SeeOther()
-            .insert_header((LOCATION, "/login"))
-            .finish();
-    }
-
+pub async fn post_upload_file(MultipartForm(form): MultipartForm<UploadForm>) -> impl Responder {
     let path = format!(
         "./{}/{}",
         form.path.to_string(),
