@@ -4,10 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-backend = { path = "../backend" }
-eframe    = "0.31.1"   # latest eframe release :contentReference[oaicite:0]{index=0}  
-egui      = "0.31.1"   # matches egui’s latest :contentReference[oaicite:1]{index=1}  
-image     = "0.25.6"   # most recent 0.25.x :contentReference[oaicite:2]{index=2}  
-rfd       = "0.15.3"   # current Rusty File Dialogs :contentReference[oaicite:3]{index=3}  
-tray-icon = "0.20.0"   # latest tray‑icon crate :contentReference[oaicite:5]{index=5}  
-
+eframe = "0.31.1"
+image = "0.25.6"
+tray-icon = "0.20.0"
