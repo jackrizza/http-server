@@ -1,7 +1,9 @@
+use crate::routes::api::{failure, wants_json};
 use actix_web::http::header::LOCATION;
-use actix_web::{post, HttpResponse, Responder};
+use actix_web::{HttpRequest, HttpResponse, Responder, http::StatusCode, post};
+use serde_json::json;
 
-use actix_multipart::form::{tempfile::TempFile, text::Text, MultipartForm};
+use actix_multipart::form::{MultipartForm, tempfile::TempFile, text::Text};
 
 #[derive(Debug, MultipartForm)]
 struct UploadForm {
@@ -11,13 +13,22 @@ struct UploadForm {
 }
 
 #[post("/upload_file")]
-pub async fn post_upload_file(MultipartForm(form): MultipartForm<UploadForm>) -> impl Responder {
-    let path = format!(
-        "./{}/{}",
-        form.path.to_string(),
-        form.file.file_name.unwrap()
-    );
-    form.file.file.persist(path).unwrap();
+pub async fn post_upload_file(
+    req: HttpRequest,
+    MultipartForm(form): MultipartForm<UploadForm>,
+) -> impl Responder {
+    let Some(name) = form.file.file_name else {
+        return failure(&req, StatusCode::BAD_REQUEST, "A filename is required");
+    };
+    let path = format!("./{}/{}", form.path.to_string(), name);
+    if let Err(error) = form.file.file.persist(path) {
+        return failure(&req, StatusCode::BAD_REQUEST, &error.to_string());
+    }
+
+    if wants_json(&req) {
+        return HttpResponse::Ok()
+            .json(json!({"ok": true, "path": form.path.to_string(), "name": name}));
+    }
 
     HttpResponse::SeeOther()
         .insert_header((LOCATION, format!("/#/{}", form.path.to_string())))

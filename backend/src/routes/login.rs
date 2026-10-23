@@ -1,11 +1,13 @@
 use crate::auth::allowed_user;
 use crate::datastore::{DataStore, Op};
+use crate::routes::api::wants_json;
 use actix_session::Session;
 use actix_web::http::header::LOCATION;
 use actix_web::{HttpRequest, HttpResponse, Responder, get, post, web};
+use log;
 use nanoid::nanoid;
 use serde::Deserialize;
-use log;
+use serde_json::json;
 
 #[derive(Debug, Deserialize)]
 struct Login {
@@ -41,19 +43,29 @@ pub async fn post_login(
         // let cookie = format!("session={}", session_id);
         match session.insert("session_key", session_key) {
             Ok(_) => {
+                if wants_json(&req) {
+                    return HttpResponse::Ok().json(json!({"ok": true}));
+                }
                 // session.renew();
                 log::debug!("session set");
                 return HttpResponse::SeeOther()
-                    .insert_header((LOCATION, "/#/."))
+                    .insert_header((LOCATION, "/#/files/"))
                     .finish();
             }
             Err(_) => {
+                if wants_json(&req) {
+                    return HttpResponse::InternalServerError()
+                        .json(json!({"error": "Session could not be saved"}));
+                }
                 return HttpResponse::SeeOther()
                     .insert_header((LOCATION, "/login?toast=cookienotset"))
                     .finish();
             }
         }
     } else {
+        if wants_json(&req) {
+            return HttpResponse::Unauthorized().json(json!({"error": "Invalid password"}));
+        }
         return HttpResponse::SeeOther()
             .insert_header((LOCATION, "/login?toast=wrongpassword"))
             .finish();

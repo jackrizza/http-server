@@ -1,0 +1,26 @@
+{
+  "name": "SpineJS",
+  "version": "0.0.1",
+  "source": "https://github.com/jackrizza/spinejs",
+  "release": "https://github.com/jackrizza/spinejs/releases/tag/v0.0.1",
+  "sourceRevision": "7121c4d1ab7e7d27c9b53e1296b73243e9494756",
+  "provenance": "Framework-only GitHub release assets, verified against the release SHA-256 digests.",
+  "vendoredOn": "2026-10-23",
+  "files": {
+    "spine.js": {
+      "sha256": "8bd8863bbd54a94480fb3044c112c92aee7038d2b89c09e7131f0bc4b1eab279",
+      "bytes": 45626,
+      "url": "https://github.com/jackrizza/spinejs/releases/download/v0.0.1/spine.js"
+    },
+    "spine.min.js": {
+      "sha256": "0a0aaf335d73ec4f36e9cf576cc0ed09680fffbcae6c2a0d827730bcc5f43c16",
+      "bytes": 23849,
+      "url": "https://github.com/jackrizza/spinejs/releases/download/v0.0.1/spine.min.js"
+    },
+    "spine.min.js.map": {
+      "sha256": "f4cedc090bacac3f76794b1f86d32c6ee1c3a09c816eea134bbd3111fa38c7f8",
+      "bytes": 77527,
+      "url": "https://github.com/jackrizza/spinejs/releases/download/v0.0.1/spine.min.js.map"
+    }
+  }
+}

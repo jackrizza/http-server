@@ -8,11 +8,7 @@ use datastore::DataStore;
 use actix_session::config::{BrowserSession, CookieContentSecurity};
 use actix_web;
 
-use routes::cdn::{
-    cpp, cs, css, css_app, css_foundation, csv, dwg, favicon, file, folder, html, img, jpg, js,
-    js_app, js_login, js_navagation, js_show_file, js_table_builder, js_upload, json, pdf, php,
-    png, sql, txt, word, xls,
-};
+use routes::cdn::{css_foundation, favicon};
 use routes::files::{all, get_file, get_video, new_folder};
 use routes::landing::landing;
 use routes::login::{login, post_login};
@@ -35,48 +31,21 @@ fn session_middleware() -> SessionMiddleware<CookieSessionStore> {
         .build()
 }
 
-// 1) At the bottom of your file (or in a new module), extract all your handlers:
 pub fn configure_public(cfg: &mut web::ServiceConfig) {
     cfg.service(login).service(post_login);
 }
 
 pub fn configure_protected_and_static(cfg: &mut web::ServiceConfig) {
-    // your “protected” endpoints
+    cfg.service(routes::spine::page)
+        .service(routes::spine::asset);
     cfg.service(post_upload_file).service(landing);
 
-    // —plus all your static/file‐serving endpoints—
     cfg.service(favicon)
         .service(all)
         .service(get_file)
         .service(get_video)
         .service(new_folder)
-        .service(css_app)
-        .service(css_foundation)
-        .service(js_app)
-        .service(js_login)
-        .service(js_navagation)
-        .service(js_show_file)
-        .service(js_table_builder)
-        .service(js_upload)
-        .service(cpp)
-        .service(cs)
-        .service(css)
-        .service(csv)
-        .service(dwg)
-        .service(file)
-        .service(folder)
-        .service(html)
-        .service(img)
-        .service(jpg)
-        .service(js)
-        .service(json)
-        .service(pdf)
-        .service(php)
-        .service(png)
-        .service(sql)
-        .service(txt)
-        .service(word)
-        .service(xls);
+        .service(css_foundation);
 }
 
 pub async fn http_router(port: u16, ds: &mut DataStore) -> std::io::Result<()> {

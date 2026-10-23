@@ -1,10 +1,13 @@
+use crate::routes::api::{failure, wants_json};
 use actix_files::NamedFile;
-use actix_multipart::form::{text::Text, MultipartForm};
+use actix_multipart::form::{MultipartForm, text::Text};
+use actix_web::http::StatusCode;
 use actix_web::http::header::LOCATION;
-use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder, Result};
-use chrono::offset::Utc;
+use actix_web::{HttpRequest, HttpResponse, Responder, Result, get, post, web};
 use chrono::DateTime;
+use chrono::offset::Utc;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::fs;
 use std::path::PathBuf;
 
@@ -19,6 +22,7 @@ struct Single {
     name: String,
     created: String,
     path: String,
+    size: Option<u64>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -37,11 +41,21 @@ struct NewFolder {
 }
 
 #[post("/api/new_folder")]
-pub async fn new_folder(MultipartForm(form): MultipartForm<NewFolder>) -> impl Responder {
+pub async fn new_folder(
+    req: HttpRequest,
+    MultipartForm(form): MultipartForm<NewFolder>,
+) -> impl Responder {
     println!("new folder : {:#?}", form);
 
     let path = format!("./{}/{}", form.path.to_string(), form.name.to_string());
-    fs::create_dir_all(path).unwrap();
+    if let Err(error) = fs::create_dir_all(path) {
+        return failure(&req, StatusCode::BAD_REQUEST, &error.to_string());
+    }
+    if wants_json(&req) {
+        return HttpResponse::Ok().json(
+            json!({"ok": true, "path": form.path.to_string(), "name": form.name.to_string()}),
+        );
+    }
 
     return HttpResponse::SeeOther()
         .insert_header((LOCATION, format!("/#/{}", form.path.to_string())))
@@ -84,36 +98,44 @@ pub async fn all(req: HttpRequest) -> impl Responder {
 
     println!("tail: {:#?}", tail);
 
-    for path in fs::read_dir(format!("./{}", tail)).unwrap() {
-        let p: String = path.unwrap().path().display().to_string();
-        let name = p.split("/").last().unwrap().to_string();
-        let is_file = fs::metadata(p.clone()).unwrap().is_file();
-        let created = fs::metadata(p.clone());
-        let created = match created {
-            Ok(created) => {
-                let created = created.created();
-                match created {
-                    Ok(created) => DateTime::<Utc>::from(created).to_rfc2822(),
-                    _ => "".into(),
-                }
-            }
-            _ => "".into(),
+    let entries = match fs::read_dir(format!("./{}", tail)) {
+        Ok(entries) => entries,
+        Err(error) => return failure(&req, StatusCode::NOT_FOUND, &error.to_string()),
+    };
+    for path in entries {
+        let entry = match path {
+            Ok(entry) => entry,
+            Err(_) => continue,
         };
+        let p = entry.path().display().to_string().replace('\\', "/");
+        let name = entry.file_name().to_string_lossy().to_string();
+        let metadata = match entry.metadata() {
+            Ok(metadata) => metadata,
+            Err(_) => continue,
+        };
+        let is_file = metadata.is_file();
+        let size = is_file.then_some(metadata.len());
+        let created = metadata
+            .created()
+            .map(|created| DateTime::<Utc>::from(created).to_rfc2822())
+            .unwrap_or_default();
 
         if is_file {
             files.0.push(About::File(Single {
                 name,
                 created,
                 path: p,
+                size,
             }));
         } else {
             files.0.push(About::Folder(Single {
                 name,
                 created,
                 path: p,
+                size,
             }));
         }
     }
 
-    web::Json(files)
+    HttpResponse::Ok().json(files)
 }

@@ -111,10 +111,9 @@ where
 
         // extract IP + session key
         let ip = req
-            .connection_info()
-            .realip_remote_addr()
-            .unwrap_or("unknown")
-            .to_string();
+            .peer_addr()
+            .map(|address| address.ip().to_string())
+            .unwrap_or_else(|| "unknown".to_string());
 
         let maybe_key: Option<String> = req.get_session().get("session_key").unwrap_or(None);
 
@@ -147,9 +146,15 @@ where
             } else {
                 // denied → redirect
                 let (req, _pl) = req.into_parts();
-                let resp = HttpResponse::SeeOther()
-                    .insert_header((http::header::LOCATION, "/login"))
-                    .finish();
+                let resp = if crate::routes::api::wants_json(&req) {
+                    HttpResponse::Unauthorized().json(
+                        serde_json::json!({"error": "Authentication required", "login": "/login"}),
+                    )
+                } else {
+                    HttpResponse::SeeOther()
+                        .insert_header((http::header::LOCATION, "/login"))
+                        .finish()
+                };
                 Ok(ServiceResponse::new(req, resp))
             }
         }
