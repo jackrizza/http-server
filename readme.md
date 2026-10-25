@@ -8,7 +8,7 @@ This project is intended for quick file sharing, not production hosting.
 
 ## Install and run
 
-After version 0.2.0 is published to crates.io, install it with Rust and Cargo:
+Install it with Rust and Cargo:
 
 ```sh
 cargo install jack-http-server --locked
@@ -141,7 +141,7 @@ For a local dry run with uncommitted release changes, add `--allow-dirty` to
 The package includes the server sources and embedded assets and excludes the GUI,
 screenshots, local TLS credentials, and build output.
 
-To publish version 0.2.0 through GitHub Actions:
+To publish version 0.2.1 through GitHub Actions:
 
 1. Configure the repository Actions secret `CARGO_REGISTRY_TOKEN` with a crates.io
    API token permitted to publish `jack-http-server` (including its first version).
@@ -149,8 +149,8 @@ To publish version 0.2.0 through GitHub Actions:
 3. Create and push the release tag:
 
    ```sh
-   git tag v0.2.0
-   git push origin v0.2.0
+   git tag v0.2.1
+   git push origin v0.2.1
    ```
 
 The release workflow checks the version and tests, publishes the crate, and then

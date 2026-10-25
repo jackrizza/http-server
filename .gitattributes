@@ -1,0 +1,4 @@
+# Preserve the exact bytes and SHA-256 digests of the vendored release assets.
+/backend/src/www/vendor/spine/spine.js -text
+/backend/src/www/vendor/spine/spine.min.js -text
+/backend/src/www/vendor/spine/spine.min.js.map -text
