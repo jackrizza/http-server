@@ -5,7 +5,7 @@ use actix_web::{
     http::{StatusCode, header},
     test, web,
 };
-use backend::{
+use http_server::{
     auth::AuthMiddleware,
     datastore::{DataStore, Op},
     routes::{files, upload},
@@ -101,10 +101,19 @@ async fn listing_previews_downloads_and_opt_in_mutations_preserve_native_forms()
             .get("File")
             .is_some_and(|file| file["name"] == "hello world.txt")
     }));
-    let text_file = entries.iter().find_map(|entry| entry.get("File")
-        .filter(|file| file["name"] == "hello world.txt")).unwrap();
+    let text_file = entries
+        .iter()
+        .find_map(|entry| {
+            entry
+                .get("File")
+                .filter(|file| file["name"] == "hello world.txt")
+        })
+        .unwrap();
     assert_eq!(text_file["size"], b"preview content".len());
-    let folder = entries.iter().find_map(|entry| entry.get("Folder")).unwrap();
+    let folder = entries
+        .iter()
+        .find_map(|entry| entry.get("Folder"))
+        .unwrap();
     assert!(folder["size"].is_null());
 
     for (name, mime, content) in [
@@ -290,11 +299,11 @@ async fn authentication_uses_cookie_session_and_reports_json_401_or_native_redir
                     .cookie_secure(false)
                     .build(),
             )
-            .configure(backend::configure_public)
+            .configure(http_server::configure_public)
             .service(
                 web::scope("")
                     .wrap(AuthMiddleware)
-                    .configure(backend::configure_protected_and_static),
+                    .configure(http_server::configure_protected_and_static),
             ),
     )
     .await;
@@ -426,8 +435,8 @@ async fn authentication_uses_cookie_session_and_reports_json_401_or_native_redir
 async fn server_owned_spine_ui_uses_only_its_frozen_framework_runtime() {
     let app = test::init_service(
         App::new()
-            .configure(backend::configure_public)
-            .configure(backend::configure_protected_and_static),
+            .configure(http_server::configure_public)
+            .configure(http_server::configure_protected_and_static),
     )
     .await;
     let page = test::call_service(&app, test::TestRequest::get().uri("/").to_request()).await;

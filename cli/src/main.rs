@@ -1,20 +1,16 @@
-use backend::datastore::{DataStore, Op};
-use backend::{http_router, https_router};
 use clap::Parser;
+use http_server::datastore::{DataStore, Op};
+use http_server::{http_router, https_router};
 
-/// Simple HTTP server
-/// refer to https://github.com/jackrizza/http-server
-/// for more information
+/// Browse, share, and upload files from the current directory.
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(name = "http-server", version, about, long_about = None)]
 struct Args {
     /// change the port number. Default is 8888
     #[arg(long, default_value_t = 8888)]
     port: u16,
 
-    /// Authenticate the user
-    /// openssl
-    /// needed for authentication (Cookies won't work without it)
+    /// Require a password over HTTPS (certificate and key required)
     #[arg(short, long, default_value_t = false)]
     authenticate: bool,
 
@@ -32,6 +28,14 @@ struct Args {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let args = Args::parse();
+
+    eprintln!("Sharing {}", std::env::current_dir()?.display());
+    let (scheme, port) = if args.authenticate {
+        ("https", 8443)
+    } else {
+        ("http", args.port)
+    };
+    eprintln!("Open {scheme}://localhost:{port}/ (Ctrl+C to stop)");
 
     let mut datastore = DataStore::new();
     datastore.listen();

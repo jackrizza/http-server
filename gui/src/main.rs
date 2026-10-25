@@ -13,7 +13,10 @@ use tray_icon::TrayIconBuilder;
 
 fn main() -> Result<(), eframe::Error> {
     // let icon = load_icon(std::path::Path::new(path));
-    let icon_path = concat!(env!("CARGO_MANIFEST_DIR"), "/src/resources/tray_icon-red.png");
+    let icon_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/src/resources/tray_icon-red.png"
+    );
     let icon = load_icon(std::path::Path::new(icon_path));
 
     // Since egui uses winit under the hood and doesn't use gtk on Linux, and we need gtk for
@@ -76,15 +79,7 @@ impl MyApp {
         self.output_rx = Some(rx);
 
         // 2) Spawn the process with stdout piped
-        let mut cmd = if cfg!(target_os = "windows") {
-            let mut c = Command::new("cmd");
-            c.args(["/C", "../target/debug/cli.exe"]);
-            c
-        } else {
-            let mut c = Command::new("sh");
-            c.args(["-c", "../target/debug/cli"]);
-            c
-        };
+        let mut cmd = Command::new("http-server");
         cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
 
         let mut child = cmd.spawn().expect("failed to spawn process");

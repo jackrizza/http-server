@@ -1,7 +1,7 @@
 // Local development host using the same embedded assets and HTTP handlers as
 // the main CLI. A separate executable avoids replacing a running CLI binary.
 use actix_web::{App, HttpServer, web};
-use backend::datastore::DataStore;
+use http_server::datastore::DataStore;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -16,8 +16,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(store.clone()))
-            .configure(backend::configure_public)
-            .configure(backend::configure_protected_and_static)
+            .configure(http_server::configure_public)
+            .configure(http_server::configure_protected_and_static)
     })
     .bind(("127.0.0.1", port))?
     .run()

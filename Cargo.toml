@@ -1,3 +1,65 @@
+[package]
+name = "jack-http-server"
+version = "0.2.0"
+edition = "2024"
+description = "Browse, share, and upload files from your current directory with an embedded web UI"
+license = "MIT"
+repository = "https://github.com/jackrizza/http-server"
+readme = "readme.md"
+keywords = ["http", "server", "files", "sharing", "cli"]
+categories = ["command-line-utilities", "web-programming::http-server"]
+default-run = "http-server"
+include = [
+    "/Cargo.toml",
+    "/Cargo.lock",
+    "/LICENSE",
+    "/readme.md",
+    "/CHANGELOG.md",
+    "/cli/src/**",
+    "/backend/src/**",
+    "/backend/tests/**",
+    "/backend/examples/**",
+    "/tests/**",
+]
+
+[lib]
+name = "http_server"
+path = "backend/src/lib.rs"
+
+[[bin]]
+name = "http-server"
+path = "cli/src/main.rs"
+
+[[test]]
+name = "spine_integration"
+path = "backend/tests/spine_integration.rs"
+
+[[example]]
+name = "spine_preview"
+path = "backend/examples/spine_preview.rs"
+
 [workspace]
 resolver = "2"
-members = ["backend", "cli", "gui"]
+members = ["gui"]
+default-members = ["."]
+
+[dependencies]
+actix-files = "0.6.6"
+actix-multipart = "0.7.2"
+actix-session = { version = "0.10.1", features = ["cookie-session"] }
+actix-web = { version = "4.10.2", features = ["rustls-0_23"] }
+rustls = "0.23.26"
+rustls-pemfile = "2.2.0"
+clap = { version = "4.5.37", features = ["derive"] }
+env_logger = "0.11.8"
+futures = "0.3.31"
+futures-util = "0.3.31"
+nanoid = "0.4.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1"
+chrono = "0.4.40"
+log = "0.4.27"
+
+[dev-dependencies]
+tempfile = "3"
+tokio = { version = "1.44.2", features = ["rt", "time"] }

@@ -51,20 +51,22 @@ impl DataStore {
     pub fn listen(&mut self) {
         let receiver = self.receiver.clone();
         let store = self.store.clone();
-        thread::spawn(move || loop {
-            let locked_receiver = receiver.lock().unwrap();
-            let packet = match locked_receiver.recv() {
-                Ok(msg) => msg,
-                Err(e) => return eprintln!("{}", e),
-            };
+        thread::spawn(move || {
+            loop {
+                let locked_receiver = receiver.lock().unwrap();
+                let packet = match locked_receiver.recv() {
+                    Ok(msg) => msg,
+                    Err(e) => return eprintln!("{}", e),
+                };
 
-            let mut locked_store = store.lock().unwrap();
-            match packet {
-                Op::Upsert(key, value) => {
-                    locked_store.insert(key, value);
-                }
-                Op::Remove(key) => {
-                    locked_store.remove(&key);
+                let mut locked_store = store.lock().unwrap();
+                match packet {
+                    Op::Upsert(key, value) => {
+                        locked_store.insert(key, value);
+                    }
+                    Op::Remove(key) => {
+                        locked_store.remove(&key);
+                    }
                 }
             }
         });

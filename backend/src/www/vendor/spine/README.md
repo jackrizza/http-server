@@ -14,5 +14,5 @@ To upgrade, download all three framework assets (`spine.js`, `spine.min.js`, and
 release metadata and update the manifest together with the files. Retain any
 upstream notices and check the application's compatibility with the new runtime.
 
-Run `cargo test -p backend` and `cargo build -p cli` after an upgrade, then check
+Run `cargo test --locked` and `cargo build --locked` after an upgrade, then check
 login, navigation, sorting, uploads, folder creation, and previews in a browser.
